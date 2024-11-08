@@ -1,11 +1,11 @@
 import Login from './auth/Login';
 import Dashboard from './dashboard/Dashboard';
 import ProtectedViews from './auth/ProtectedViews';
-import Home from './home/Home.jsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from './contexts/AuthContext';
 import { loader as loginLoader } from './auth/Login';
+import Root from './home/Root';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -14,7 +14,7 @@ const App = () => {
     [
       {
         path: '/',
-        element: <Home />,
+        element: <Root />,
         children: [
           {
             path: '/login',
