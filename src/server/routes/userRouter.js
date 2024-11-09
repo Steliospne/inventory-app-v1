@@ -1,10 +1,11 @@
 import Router from 'express';
-
+import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
 import pool from '../db/pool.js';
 import { LoginSchema } from '../../lib/definitions.js';
+import { getProducts } from '../db/queries.js';
 
 export const userRouter = Router();
 
@@ -48,6 +49,12 @@ passport.use(
       );
       const user = rows[0];
 
+      if (!user) return done(null, false, { messages: 'user not found' });
+
+      const matches = await bcrypt.compare(password, user.password);
+
+      if (!matches) return done(null, false, { messages: 'wrong password' });
+
       return done(null, user);
     } catch (err) {
       return done(err);
@@ -74,6 +81,8 @@ passport.deserializeUser(async (id, done) => {
 
 userRouter.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info, status) => {
+    if (err) next(err);
+
     req.session.regenerate((err) => {
       if (err) next(err);
 
@@ -101,4 +110,10 @@ userRouter.get('/logout', (req, res, next) => {
       data: { user: req.user },
     });
   });
+});
+
+userRouter.use((err, req, res, next) => {
+  console.error('Error:', err.message);
+  next();
+  // res.status(500).json({ error: err.message });
 });

@@ -4,15 +4,19 @@ import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import FeatureCard from '../components/FeatureCard';
+import Sidebar from '../components/Sidebar';
+import BrandLogo from '../components/BrandLogo';
 
 const Root = () => {
   const { user, logoutAction } = useContext(AuthContext);
   const Outlet = useOutlet();
 
   return (
-    <div className='flex h-svh flex-col'>
+    <div className='grid auto-cols-auto grid-cols-main_layout grid-rows-main_layout h-svh'>
+      <BrandLogo />
       <Navbar user={user} logoutAction={logoutAction} />
-      <div className='flex-1 bg-zinc-100 dark:bg-zinc-600 dark:text-white'>
+      {user && <Sidebar />}
+      <div className='col-start-2 bg-zinc-100 dark:bg-zinc-600 dark:text-white'>
         {Outlet !== null ? (
           Outlet
         ) : (

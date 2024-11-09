@@ -1,7 +1,8 @@
 #! /usr/bin/env node
-const { Client } = require('pg');
-const { query } = require('./pool');
-require('dotenv').config();
+import 'dotenv/config';
+import pg from 'pg';
+const { Client } = pg;
+import bcrypt from 'bcryptjs';
 
 const USER = process.env.DATABASE_USER_LOCAL;
 const SECRET = process.env.DATABASE_SECRET_LOCAL;
@@ -48,6 +49,7 @@ const createTableProducts = `CREATE TABLE IF NOT EXISTS products (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     selling_price DECIMAL(10,2) NOT NULL,
+    current_stock INTEGER NOT NULL,
     category_id INTEGER REFERENCES product_categories(id),
     is_available BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -132,18 +134,126 @@ const queries = [
 
 const populate = async () => {
   console.log('populating...');
-  const client = new Client({
-    connectionString: `postgresql://${USER}:${SECRET}@${HOST}/${NAME}`,
-  });
-  await client.connect();
+  try {
+    const client = new Client({
+      connectionString: `postgresql://${USER}:${SECRET}@${HOST}/${NAME}`,
+    });
+    await client.connect();
 
-  const queryPromises = queries.map(async (query) => {
-    await client.query(query);
-  });
+    const queryPromises = queries.map(async (query) => {
+      await client.query(query);
+    });
 
-  await Promise.all(queryPromises);
+    await Promise.all(queryPromises);
 
-  await client.end();
+    await client.end();
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 };
 
-populate();
+/**
+ * Creates a new user with an encrypted password
+ * @param {Object} user - User object containing registration details
+ * @param {string} user.firstname - User's first name
+ * @param {string} user.lastname - User's last name
+ * @param {string} user.username - User's username
+ * @param {string} user.email - User's email address
+ * @param {string} user.password - User's plain text password
+ * @param {string} [user.role='employee'] - User's role (employee, manager, or admin)
+ * @returns {Boolean} True/False
+ * @throws {Error} If there's a database error or validation failure
+ */
+async function createUser(user) {
+  // Input validation
+  const requiredFields = [
+    'firstname',
+    'lastname',
+    'username',
+    'email',
+    'password',
+  ];
+  for (const field of requiredFields) {
+    if (!user[field]) {
+      throw new Error(`Missing required field: ${field}`);
+    }
+  }
+
+  try {
+    const client = new Client({
+      connectionString: `postgresql://${USER}:${SECRET}@${HOST}/${NAME}`,
+    });
+    await client.connect();
+    // Generate salt and hash password
+    const salt = 10;
+    const hashedPassword = await bcrypt.hash(user.password, salt);
+
+    // SQL query for user insertion
+    const query = `
+        INSERT INTO users (
+          firstname,
+          lastname,
+          username,
+          email,
+          password,
+          role
+        )
+        VALUES ($1, $2, $3, $4, $5, $6);
+      `;
+
+    await Promise.all(hashedPassword);
+
+    // Query parameters
+    const values = [
+      user.firstname,
+      user.lastname,
+      user.username,
+      user.email,
+      hashedPassword,
+      user.role || 'employee', // Default to 'employee' if role not specified
+    ];
+    // Execute query
+    const result = await client.query(query, values);
+
+    await client.end();
+    return true;
+  } catch (error) {
+    // Handle specific database errors
+    if (error.code === '23505') {
+      // Unique violation
+      if (error.constraint.includes('email')) {
+        throw new Error('Email already exists');
+      }
+      if (error.constraint.includes('username')) {
+        throw new Error('Username already exists');
+      }
+    }
+
+    // Re-throw other errors
+    throw error;
+  }
+}
+
+const user2 = {
+  firstname: 'Jerry',
+  lastname: 'Pnevmatikakis',
+  email: 'jery@domain.com',
+  username: 'jery@domain.com',
+  password: '1234',
+  role: 'admin',
+};
+
+const user = {
+  firstname: 'Stelios',
+  lastname: 'Pnevmatikakis',
+  email: 'example@domain.com',
+  username: 'example@domain.com',
+  password: '1234',
+  role: 'admin',
+};
+
+createUser(user);
+
+// populate();
