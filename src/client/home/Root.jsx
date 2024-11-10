@@ -16,7 +16,9 @@ const Root = () => {
       <BrandLogo />
       <Navbar user={user} logoutAction={logoutAction} />
       {user && <Sidebar />}
-      <div className='col-start-2 bg-zinc-100 dark:bg-zinc-600 dark:text-white'>
+      <div
+        className={`${user ? 'col-start-2' : 'col-start-1 col-end-3'} bg-zinc-100 dark:bg-zinc-600 dark:text-white`}
+      >
         {Outlet !== null ? (
           Outlet
         ) : (

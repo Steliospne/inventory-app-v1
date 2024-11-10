@@ -77,7 +77,7 @@ const createTableInventoryTransactions = `CREATE TABLE IF NOT EXISTS inventory_t
 );`;
 
 // -- Suppliers table
-const createTableSupplies = `CREATE TABLE IF NOT EXISTS suppliers (
+const createTableSuppliers = `CREATE TABLE IF NOT EXISTS suppliers (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     contact_person VARCHAR(100),
