@@ -7,6 +7,7 @@ export const loader = async ({ params }) => {
 
 const Login = () => {
   const { message } = useLoaderData();
+  console.log(message);
   return (
     <div className='flex h-full items-center justify-center'>
       <Form

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 export const fetchProducts = () => {
   const { isPending, error, data, isFetching } = useQuery({
@@ -7,6 +8,11 @@ export const fetchProducts = () => {
       const response = await fetch(
         new URL('http://localhost:3000/api/products'),
       );
+
+      if (response.status === 404) {
+        throw new Response('', { status: 404 });
+      }
+
       return await response.json();
     },
   });
@@ -27,6 +33,10 @@ export const fetchCategories = () => {
         new URL('http://localhost:3000/api/categories'),
       );
 
+      if (response.status === 404) {
+        throw new Response('', { status: 404 });
+      }
+
       return await response.json();
     },
   });
@@ -40,13 +50,12 @@ export const fetchCategories = () => {
 };
 
 export const updateProducts = async (products) => {
-  const response = await fetch(new URL('http://localhost:3000/api/products'), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(products),
-  });
-
-  return response;
+  try {
+    const response = await axios.post('http://localhost:3000/api/products', {
+      products,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };

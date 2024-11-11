@@ -5,7 +5,6 @@ import session from 'express-session';
 import { Strategy } from 'passport-local';
 import pool from '../db/pool.js';
 import { LoginSchema } from '../../lib/definitions.js';
-import { getProducts } from '../db/queries.js';
 
 export const userRouter = Router();
 
@@ -21,12 +20,14 @@ userRouter.use(passport.session());
 
 passport.use(
   new Strategy(async (username, password, done) => {
+    // Validate login fields
     try {
       const validatedFields = LoginSchema.safeParse({
         username: username,
         password: password,
       });
 
+      // If validations fails provide user with info
       if (!validatedFields.success) {
         const errors = validatedFields.error.errors;
 
@@ -44,40 +45,31 @@ passport.use(
       }
 
       const { rows } = await pool.query(
-        'SELECT * FROM users WHERE email = $1',
+        'SELECT * FROM users WHERE email = $1;',
         [username],
       );
       const user = rows[0];
 
-      if (!user) return done(null, false, { messages: 'user not found' });
+      // If validation is ok check if there is a user
+      if (!user)
+        return done(null, false, {
+          messages: { username: ['User not found with this email'] },
+        });
 
       const matches = await bcrypt.compare(password, user.password);
 
-      if (!matches) return done(null, false, { messages: 'wrong password' });
+      // Finally check for a matching password
+      if (!matches)
+        return done(null, false, {
+          messages: { password: ['Wrong credentials'] },
+        });
 
-      return done(null, user);
+      return done(null, user.id);
     } catch (err) {
       return done(err);
     }
   }),
 );
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [
-      id,
-    ]);
-    const user = rows[0];
-
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
 
 userRouter.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info, status) => {
@@ -95,6 +87,9 @@ userRouter.post('/login', (req, res, next) => {
       req.session.save((err) => {
         if (err) return next(err);
       });
+
+      if (!user)
+        return res.status(401).send({ data: { messages: info?.messages } });
 
       res.send({
         data: { user: req.user, messages: info?.messages },
@@ -115,5 +110,5 @@ userRouter.get('/logout', (req, res, next) => {
 userRouter.use((err, req, res, next) => {
   console.error('Error:', err.message);
   next();
-  // res.status(500).json({ error: err.message });
+  res.status(500);
 });

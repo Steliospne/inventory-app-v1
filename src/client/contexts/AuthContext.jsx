@@ -23,21 +23,34 @@ const AuthProvider = ({ children }) => {
         }),
       });
 
-      if (res.ok) {
-        const { data } = await res.json();
+      if (res.status === 404) {
+        throw new Response('', { status: 404 });
+      }
+
+      const { data } = await res.json();
+
+      if (res.ok && data) {
         if (!data.user) {
-          params.message = data.messages;
-          if (params.message === undefined) params.message = null;
-          return params.message;
+          return params.message === undefined
+            ? (params.message = null)
+            : (params.message = data.messages);
         }
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
         return redirect('/dashboard');
       }
-      return redirect('/login');
+
+      if (res.status === 401) {
+        if (data) {
+          redirect('/login');
+          return data.messages === undefined
+            ? (params.message = null)
+            : (params.message = data.messages);
+        }
+      }
     } catch (error) {
       console.error(error);
-      return redirect('/login');
+      throw error;
     }
   };
 
@@ -58,7 +71,8 @@ const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error;
     }
   };
 

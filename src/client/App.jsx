@@ -7,6 +7,7 @@ import { AuthContext } from './contexts/AuthContext';
 import { loader as loginLoader } from './auth/Login';
 import Root from './home/Root';
 import Products from './products/Products';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -37,6 +38,12 @@ const App = () => {
             ],
           },
         ],
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: '/error',
+        element: <ErrorBoundary />,
+        errorElement: <ErrorBoundary />,
       },
     ],
     {

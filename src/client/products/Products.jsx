@@ -1,4 +1,4 @@
-import { CloudCog, PanelTopClose, PanelTopOpen } from 'lucide-react';
+import { PanelTopClose, PanelTopOpen } from 'lucide-react';
 import {
   fetchProducts,
   fetchCategories,
@@ -10,7 +10,8 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const columnHelper = createColumnHelper();
 
@@ -92,7 +93,8 @@ const Products = () => {
 
   const [tableData, setTableData] = useState(() => productData);
   const [open, setOpen] = useState(false);
-
+  const edit = useRef(false);
+  const navigate = useNavigate();
   useEffect(() => {
     if (productData) {
       setTableData(productData);
@@ -102,7 +104,7 @@ const Products = () => {
   const table = useReactTable({
     data: productData,
     columns,
-    defaultColumn,
+    defaultColumn: defaultColumn,
     getCoreRowModel: getCoreRowModel(),
     meta: {
       updateData: (rowIndex, columnId, value) => {
@@ -122,9 +124,19 @@ const Products = () => {
   });
 
   const handleClick = async () => {
-    const res = await updateProducts(tableData);
+    try {
+      await updateProducts(tableData);
+    } catch (error) {
+      if (error.status !== 200) {
+        navigate('/error', {
+          state: { error: new Error(`${error.status}`) },
+        });
+      }
+    }
     console.log(tableData);
   };
+
+  if (productError) throw productError;
 
   if (!pendingProducts) {
     return (
