@@ -1,25 +1,13 @@
-import {
-  isRouteErrorResponse,
-  useLocation,
-  useNavigate,
-  useRouteError,
-} from 'react-router-dom';
+import { useNavigate, useRouteError } from 'react-router-dom';
 import { Bug, CircleX } from 'lucide-react';
 import { displayErrors } from '../../lib/errorUtil';
 
 const ErrorBoundary = ({ initialError }) => {
-  const fromPath = useLocation();
-  const error = fromPath
-    ? fromPath.state.error
-    : initialError
-      ? initialError
-      : useRouteError();
+  const error = initialError ? initialError : useRouteError();
   const navigate = useNavigate();
-  const isResponse =
-    Object.getPrototypeOf(error) == Object.getPrototypeOf(new Response());
 
   let displayError = null;
-  if (isRouteErrorResponse(error) || isResponse) {
+  if (error?.status) {
     switch (error.status) {
       case 500:
         displayError = displayErrors('Server Error', error.status);

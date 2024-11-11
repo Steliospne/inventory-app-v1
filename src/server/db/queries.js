@@ -20,6 +20,29 @@ export const getProducts = async () => {
   return rows;
 };
 
+export const getProduct = async (id) => {
+  const query = `
+    SELECT
+      p.id AS id, 
+      p.name AS product,
+      p.selling_price AS price,
+      p.current_stock AS stock, 
+      pc.name AS category
+    FROM 
+      products p
+    JOIN 
+      product_categories pc ON p.category_id = pc.id
+    WHERE 
+      p.id = $1 
+    ORDER BY 
+      pc.name, p.name;
+  `;
+  const values = [id];
+  const { rows } = await pool.query(query, values);
+
+  return rows;
+};
+
 export const getCategories = async () => {
   const query = `
     SELECT name, id FROM product_categories;
@@ -28,7 +51,7 @@ export const getCategories = async () => {
 
   return rows;
 };
-export const updateProducts = async (products) => {
+export const updateProduct = async (id, product) => {
   const query = `
     UPDATE products
     SET 
@@ -39,16 +62,12 @@ export const updateProducts = async (products) => {
     WHERE 
       id = $5;
   `;
-
-  products.forEach(async (product) => {
-    const values = [
-      product.product,
-      product.category,
-      product.stock,
-      product.price,
-      product.id,
-    ];
-    await pool.query(query, values);
-    console.log(values);
-  });
+  const values = [
+    product.product,
+    product.category,
+    product.stock,
+    product.price,
+    id,
+  ];
+  await pool.query(query, values);
 };

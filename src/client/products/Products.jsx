@@ -1,76 +1,15 @@
 import { PanelTopClose, PanelTopOpen } from 'lucide-react';
-import {
-  fetchProducts,
-  fetchCategories,
-  updateProducts,
-} from '../../lib/data.js';
+import { fetchProducts, fetchCategories } from '../../lib/data.js';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const columnHelper = createColumnHelper();
-
-const defaultColumn = {
-  cell: ({ getValue, row: { index }, column: { id }, table }) => {
-    const initialValue = getValue();
-    // We need to keep and update the state of the cell normally
-    const [value, setValue] = useState(initialValue);
-
-    const {
-      pendingCategories,
-      categoryError,
-      categoryData,
-      fetchingCategories,
-    } = fetchCategories();
-
-    // When the input is blurred, we'll call our table meta's updateData function
-    const onBlur = () => {
-      table.options.meta?.updateData(index, id, value);
-    };
-
-    // If the initialValue is changed external, sync it up with our state
-    useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
-
-    if (id == 'category' && !pendingCategories)
-      return (
-        <select
-          onChange={(e) => {
-            setValue(e.target.value);
-            () => table.options.meta?.updateData(index, id, value);
-          }}
-          className='flex w-full'
-          name='category'
-          value={value}
-          onBlur={onBlur}
-        >
-          {categoryData.map((category) => (
-            <option key={category.name} value={category.name}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-      );
-
-    return (
-      <div className='flex'>
-        <input
-          className='w-full'
-          value={value || ''}
-          name={id}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={onBlur}
-        />
-      </div>
-    );
-  },
-};
 
 const columns = [
   columnHelper.accessor('product', {
@@ -85,65 +24,37 @@ const columns = [
   columnHelper.accessor('price', {
     header: () => <span>Price</span>,
   }),
+  columnHelper.accessor('id', {
+    header: () => <span>Action</span>,
+    cell: (info) => (
+      <button>
+        <Link to={`/edit/products/${info.getValue()}`}>Edit</Link>
+      </button>
+    ),
+  }),
 ];
 
 const Products = () => {
   const { pendingProducts, productError, productData, fetchingProducts } =
     fetchProducts();
 
-  const [tableData, setTableData] = useState(() => productData);
   const [open, setOpen] = useState(false);
-  const edit = useRef(false);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (productData) {
-      setTableData(productData);
-    }
-  }, [productData]);
 
   const table = useReactTable({
     data: productData,
     columns,
-    defaultColumn: defaultColumn,
     getCoreRowModel: getCoreRowModel(),
-    meta: {
-      updateData: (rowIndex, columnId, value) => {
-        setTableData((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex],
-                [columnId]: value,
-              };
-            }
-            return row;
-          }),
-        );
-      },
-    },
   });
 
-  const handleClick = async () => {
-    try {
-      await updateProducts(tableData);
-    } catch (error) {
-      if (error.status !== 200) {
-        navigate('/error', {
-          state: { error: new Error(`${error.status}`) },
-        });
-      }
-    }
-    console.log(tableData);
-  };
-
   if (productError) throw productError;
+
+  if (fetchingProducts) return <p>Loading...</p>;
 
   if (!pendingProducts) {
     return (
       <div className='relative flex h-full flex-col'>
-        <div className={`w-full bg-blue-200 ${open ? 'h-10' : 'hidden'}`}>
-          <button onClick={handleClick}>Test</button>
-        </div>
+        <div className={`w-full bg-blue-200 ${open ? 'h-10' : 'hidden'}`}></div>
         <button className='relative h-0 w-0' onClick={() => setOpen(!open)}>
           {open ? <PanelTopClose /> : <PanelTopOpen />}
         </button>

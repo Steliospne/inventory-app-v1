@@ -8,6 +8,7 @@ import { loader as loginLoader } from './auth/Login';
 import Root from './home/Root';
 import Products from './products/Products';
 import ErrorBoundary from './components/ErrorBoundary';
+import EditProduct, { action as editAction } from './components/EditProduct';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -35,14 +36,14 @@ const App = () => {
                 path: '/products',
                 element: <Products />,
               },
+              {
+                path: '/edit/products/:productId',
+                element: <EditProduct />,
+                action: editAction,
+              },
             ],
           },
         ],
-        errorElement: <ErrorBoundary />,
-      },
-      {
-        path: '/error',
-        element: <ErrorBoundary />,
         errorElement: <ErrorBoundary />,
       },
     ],

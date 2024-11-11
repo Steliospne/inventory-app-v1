@@ -1,5 +1,10 @@
 import Router from 'express';
-import { getProducts, getCategories, updateProducts } from '../db/queries.js';
+import {
+  getProduct,
+  getProducts,
+  getCategories,
+  updateProduct,
+} from '../db/queries.js';
 
 export const apiRouter = Router();
 
@@ -8,9 +13,16 @@ apiRouter.get('/api/products', async (req, res) => {
   res.send(products);
 });
 
-apiRouter.post('/api/products', async (req, res) => {
-  const { products } = req.body;
-  await updateProducts(products);
+apiRouter.get('/api/products/:productId', async (req, res) => {
+  const productId = req.params.productId;
+  const [products] = await getProduct(productId);
+  res.send(products);
+});
+
+apiRouter.put('/api/products/:productId', async (req, res) => {
+  const productId = req.params.productId;
+  const { product } = req.body;
+  await updateProduct(productId, product);
   res.send();
 });
 

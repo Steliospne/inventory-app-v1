@@ -5,15 +5,8 @@ export const fetchProducts = () => {
   const { isPending, error, data, isFetching } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await fetch(
-        new URL('http://localhost:3000/api/products'),
-      );
-
-      if (response.status === 404) {
-        throw new Response('', { status: 404 });
-      }
-
-      return await response.json();
+      const response = await axios.get('http://localhost:3000/api/products');
+      return response.data;
     },
   });
 
@@ -25,19 +18,31 @@ export const fetchProducts = () => {
   };
 };
 
+export const fetchProduct = (id) => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['product', id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `http://localhost:3000/api/products/${id}`,
+      );
+      return response.data;
+    },
+  });
+
+  return {
+    pendingProduct: isPending,
+    productError: error,
+    productData: data,
+    fetchingProduct: isFetching,
+  };
+};
+
 export const fetchCategories = () => {
   const { isPending, error, data, isFetching } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await fetch(
-        new URL('http://localhost:3000/api/categories'),
-      );
-
-      if (response.status === 404) {
-        throw new Response('', { status: 404 });
-      }
-
-      return await response.json();
+      const response = await axios.get('http://localhost:3000/api/categories');
+      return response.data;
     },
   });
 
@@ -49,11 +54,14 @@ export const fetchCategories = () => {
   };
 };
 
-export const updateProducts = async (products) => {
+export const updateProduct = async (id, product) => {
   try {
-    const response = await axios.post('http://localhost:3000/api/products', {
-      products,
-    });
+    const response = await axios.put(
+      `http://localhost:3000/api/products/${id}`,
+      {
+        product,
+      },
+    );
     return response;
   } catch (error) {
     throw error;
