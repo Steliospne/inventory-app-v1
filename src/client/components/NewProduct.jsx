@@ -1,35 +1,36 @@
 import { useEffect, useState } from 'react';
-import { fetchCategories, fetchProduct } from '../lib/data';
-import { Form, Link, redirect, useParams } from 'react-router-dom';
-import { updateProduct } from '../lib/data';
+import { fetchCategories } from '../lib/data';
+import { Form, Link, redirect } from 'react-router-dom';
+import { createNewProduct } from '../lib/data';
 import Dropdown from './DropDown';
 
-export const action = async ({ params, request }) => {
+export const action = async ({ request }) => {
   const formData = await request.formData();
   const product = Object.fromEntries(formData);
-  const { productId } = params;
-  const res = await updateProduct(productId, product);
+  const res = await createNewProduct(product);
   if (res.status === 200) return redirect('/products');
 };
 
 const EditProduct = () => {
-  const { productId } = useParams();
-  const { pendingProduct, productError, productData, fetchingProduct } =
-    fetchProduct(productId);
   const { pendingCategories, categoryError, categoryData, fetchingCategories } =
     fetchCategories();
 
-  const [formData, setFormData] = useState(productData);
+  const [formData, setFormData] = useState({});
+
+  const handleInputChange = (event) => {
+    const field = event.target.name;
+    const value = event.target.value;
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+    console.log(formData);
+  };
 
   const [options, setOptions] = useState(categoryData);
   const [selectedOption, setSelectedOption] = useState('');
   const [newOption, setNewOption] = useState({ name: '' });
   const [isAddingNew, setIsAddingNew] = useState(false);
-
-  useEffect(() => {
-    setOptions(categoryData);
-    setFormData(productData);
-  }, [productData, categoryData]);
 
   const handleSelectChange = (event) => {
     if (event.target.value === 'add_new') {
@@ -43,7 +44,6 @@ const EditProduct = () => {
       });
       setSelectedOption(value);
     }
-    console.log(formData);
   };
 
   const handleAddNewOption = () => {
@@ -59,7 +59,6 @@ const EditProduct = () => {
       setSelectedOption(newOption.name);
       setNewOption({});
       setIsAddingNew(false);
-      console.log('added new', formData, newOption.name);
     }
     setSelectedOption(newOption.name);
     setNewOption({});
@@ -70,17 +69,12 @@ const EditProduct = () => {
     setNewOption({ name: event.target.value });
   };
 
-  const handleInputChange = (event) => {
-    const field = event.target.name;
-    const value = event.target.value;
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
-  };
+  useEffect(() => {
+    setOptions(categoryData);
+  }, [categoryData]);
 
   return (
-    formData && (
+    !fetchingCategories && (
       <div className='flex h-full items-center justify-center'>
         <Form
           method='post'
@@ -95,14 +89,13 @@ const EditProduct = () => {
               name='product'
               id='product'
               autoComplete='product'
-              value={formData.product}
               onChange={handleInputChange}
               required
-              className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
+              className='mt-4 h-10 rounded-lg border border-emerald-300 p-2 px-4 py-5 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50'
             />
           </div>
           {/* {message?.username && formErrors(message.username)} */}
-          <div className='mt-4 flex flex-col'>
+          <div className='flex flex-col'>
             <label htmlFor='category' className='text-lg font-medium'>
               Category:
             </label>
@@ -127,9 +120,8 @@ const EditProduct = () => {
               id='stock'
               autoComplete='stock'
               required
-              value={formData.stock}
               onChange={handleInputChange}
-              className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
+              className='mt-4 h-10 rounded-lg border border-emerald-300 p-2 px-4 py-5 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50'
             />
           </div>
           <div className='flex flex-col'>
@@ -142,9 +134,8 @@ const EditProduct = () => {
               id='price'
               autoComplete='price'
               required
-              value={formData.price}
               onChange={handleInputChange}
-              className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
+              className='mt-4 h-10 rounded-lg border border-emerald-300 p-2 px-4 py-5 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50'
             />
           </div>
           <div className='flex gap-6'>

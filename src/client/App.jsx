@@ -10,6 +10,10 @@ import Products from './products/Products';
 import Suppliers from './suppliers/Suppliers';
 import ErrorBoundary from './components/ErrorBoundary';
 import EditProduct, { action as editAction } from './components/EditProduct';
+import NewProduct, {
+  action as createProductAction,
+} from './components/NewProduct';
+import Categories from './components/Categories';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -34,6 +38,10 @@ const App = () => {
                 element: <Dashboard />,
               },
               {
+                path: '/categories',
+                element: <Categories />,
+              },
+              {
                 path: '/products',
                 element: <Products />,
               },
@@ -45,6 +53,11 @@ const App = () => {
                 path: '/edit/products/:productId',
                 element: <EditProduct />,
                 action: editAction,
+              },
+              {
+                path: '/newProduct',
+                element: <NewProduct />,
+                action: createProductAction,
               },
             ],
           },

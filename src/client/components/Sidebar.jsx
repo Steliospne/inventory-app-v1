@@ -2,16 +2,22 @@ import { NavLink } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
-    <aside className='flex flex-col col-start-1 row-start-2 my-4'>
+    <aside className='col-start-1 row-start-2 my-4 flex flex-col'>
       <NavLink
         to='/dashboard'
-        className='w-full hover:rounded-lg hover:bg-emerald-200 px-2 py-3'
+        className='w-full px-2 py-3 hover:rounded-lg hover:bg-emerald-200'
       >
         Dashboard
       </NavLink>
       <NavLink
+        to='/categories'
+        className='w-full px-2 py-3 hover:rounded-lg hover:bg-emerald-200'
+      >
+        Categories
+      </NavLink>
+      <NavLink
         to='/products'
-        className='w-full hover:rounded-lg hover:bg-emerald-200 px-2 py-3'
+        className='w-full px-2 py-3 hover:rounded-lg hover:bg-emerald-200'
       >
         Products
       </NavLink>

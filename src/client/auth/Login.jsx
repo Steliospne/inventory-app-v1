@@ -1,4 +1,4 @@
-import { formErrors } from '../../lib/errorUtil';
+import { formErrors } from '../lib/errorUtil';
 import { Form, useLoaderData } from 'react-router-dom';
 
 export const loader = async ({ params }) => {
