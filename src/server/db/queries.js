@@ -51,6 +51,7 @@ export const getCategories = async () => {
 
   return rows;
 };
+
 export const updateProduct = async (id, product) => {
   const query = `
     UPDATE products
@@ -71,3 +72,20 @@ export const updateProduct = async (id, product) => {
   ];
   await pool.query(query, values);
 };
+
+export const getSuppliers = async () =>{
+  const query = `
+  SELECT
+  s.id AS id,
+  s.name AS supplier,
+  s.email AS email,
+  s.phone AS phone
+  FROM
+  suppliers s
+  ORDER BY
+  s.name;
+  `
+  const { rows } = await pool.query(query);
+
+  return rows;
+}
