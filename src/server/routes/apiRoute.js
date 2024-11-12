@@ -4,6 +4,8 @@ import {
   getProducts,
   getCategories,
   updateProduct,
+  createNewProduct,
+  deleteProduct,
 } from '../db/queries.js';
 
 export const apiRouter = Router();
@@ -19,10 +21,22 @@ apiRouter.get('/api/products/:productId', async (req, res) => {
   res.send(products);
 });
 
+apiRouter.post('/api/newProduct', async (req, res) => {
+  const { product } = req.body;
+  await createNewProduct(product);
+  res.send();
+});
+
 apiRouter.put('/api/products/:productId', async (req, res) => {
   const productId = req.params.productId;
   const { product } = req.body;
   await updateProduct(productId, product);
+  res.send();
+});
+
+apiRouter.delete('/api/delete/products/:productId', async (req, res) => {
+  const productId = req.params.productId;
+  await deleteProduct(productId);
   res.send();
 });
 

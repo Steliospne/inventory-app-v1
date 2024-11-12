@@ -1,45 +1,82 @@
-import { PanelTopClose, PanelTopOpen } from 'lucide-react';
-import { fetchProducts, fetchCategories } from '../../lib/data.js';
+import { CirclePlus, Trash2, Pencil } from 'lucide-react';
+import { fetchProducts, deleteProduct } from '../../lib/data.js';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+
+import { Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const columnHelper = createColumnHelper();
-
-const columns = [
-  columnHelper.accessor('product', {
-    header: () => <span>Product</span>,
-  }),
-  columnHelper.accessor('category', {
-    header: () => <span>Category</span>,
-  }),
-  columnHelper.accessor('stock', {
-    header: () => <span>Stock</span>,
-  }),
-  columnHelper.accessor('price', {
-    header: () => <span>Price</span>,
-  }),
-  columnHelper.accessor('id', {
-    header: () => <span>Action</span>,
-    cell: (info) => (
-      <button>
-        <Link to={`/edit/products/${info.getValue()}`}>Edit</Link>
-      </button>
-    ),
-  }),
-];
 
 const Products = () => {
   const { pendingProducts, productError, productData, fetchingProducts } =
     fetchProducts();
 
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (productId) => deleteProduct(productId),
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+
+  const columns = [
+    columnHelper.accessor('product', {
+      header: () => <span>Product</span>,
+    }),
+    columnHelper.accessor('category', {
+      header: () => <span>Category</span>,
+    }),
+    columnHelper.accessor('stock', {
+      header: () => <span>Stock</span>,
+    }),
+    columnHelper.accessor('price', {
+      header: () => <span>Price</span>,
+    }),
+    columnHelper.accessor('id', {
+      header: () => <span>Action</span>,
+      cell: (info) => (
+        <div className='flex items-center justify-center gap-2'>
+          <Link
+            className='transition duration-200 ease-in-out hover:scale-110'
+            to={`/edit/products/${info.getValue()}`}
+          >
+            <Pencil />
+          </Link>
+          <button
+            className='transition duration-200 ease-in-out hover:scale-110'
+            onClick={async () => {
+              if (
+                window.confirm('Are you sure you want to delete this product?')
+              ) {
+                try {
+                  await deleteMutation.mutateAsync(info.getValue());
+                } catch (error) {
+                  console.error('Error deleting user:', error);
+                }
+              }
+            }}
+          >
+            <Trash2 className='stroke-red-500' />
+          </button>
+        </div>
+      ),
+      footer: () => (
+        <Link
+          to={'/newProduct'}
+          className='flex justify-center p-2 transition duration-200 ease-in-out hover:scale-125'
+        >
+          <CirclePlus className='fill-emerald-400' />
+        </Link>
+      ),
+    }),
+  ];
 
   const table = useReactTable({
     data: productData,
@@ -53,11 +90,7 @@ const Products = () => {
 
   if (!pendingProducts) {
     return (
-      <div className='relative flex h-full flex-col'>
-        <div className={`w-full bg-blue-200 ${open ? 'h-10' : 'hidden'}`}></div>
-        <button className='relative h-0 w-0' onClick={() => setOpen(!open)}>
-          {open ? <PanelTopClose /> : <PanelTopOpen />}
-        </button>
+      <div className='flex h-full flex-col'>
         <div className='flex h-full max-h-svh flex-1 items-center justify-center p-2'>
           <table className='m-4 w-full max-w-2xl bg-white'>
             <thead className='bg-emerald-400'>
@@ -99,6 +132,22 @@ const Products = () => {
                 </tr>
               ))}
             </tbody>
+            <tfoot className='bg-zinc-100'>
+              {table.getFooterGroups().map((footerGroup) => (
+                <tr key={footerGroup.id}>
+                  {footerGroup.headers.map((header) => (
+                    <th key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.footer,
+                            header.getContext(),
+                          )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </tfoot>
           </table>
         </div>
       </div>

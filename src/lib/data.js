@@ -1,6 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
+export const createNewProduct = async (product) => {
+  try {
+    const response = await axios.post(`http://localhost:3000/api/newProduct`, {
+      product,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const fetchProducts = () => {
   const { isPending, error, data, isFetching } = useQuery({
     queryKey: ['products'],
@@ -61,6 +72,17 @@ export const updateProduct = async (id, product) => {
       {
         product,
       },
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteProduct = async (id) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:3000/api/delete/products/${id}`,
     );
     return response;
   } catch (error) {

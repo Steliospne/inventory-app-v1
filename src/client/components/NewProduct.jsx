@@ -1,28 +1,22 @@
-import { useEffect, useState } from 'react';
-import { fetchCategories, fetchProduct } from '../../lib/data';
-import { Form, Link, redirect, useParams } from 'react-router-dom';
-import { updateProduct } from '../../lib/data';
+import { useState } from 'react';
+import { fetchCategories } from '../../lib/data';
+import { Form, Link, redirect } from 'react-router-dom';
+import { createNewProduct } from '../../lib/data';
 
-export const action = async ({ params, request }) => {
+export const action = async ({ request }) => {
   const formData = await request.formData();
   const product = Object.fromEntries(formData);
-  const { productId } = params;
-  const res = await updateProduct(productId, product);
+  console.log(product);
+  const res = await createNewProduct(product);
+  console.log(res);
   if (res.status === 200) return redirect('/products');
 };
 
 const EditProduct = () => {
-  const { productId } = useParams();
-  const { pendingProduct, productError, productData, fetchingProduct } =
-    fetchProduct(productId);
   const { pendingCategories, categoryError, categoryData, fetchingCategories } =
     fetchCategories();
 
-  const [formData, setFormData] = useState(productData);
-
-  useEffect(() => {
-    setFormData(productData);
-  }, [productData]);
+  const [formData, setFormData] = useState({});
 
   // console.log(formData);
 
@@ -51,7 +45,6 @@ const EditProduct = () => {
             name='product'
             id='product'
             autoComplete='product'
-            value={fetchingProduct ? 'Loading...' : formData?.product}
             onChange={handleInputChange}
             required
             className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
@@ -65,7 +58,6 @@ const EditProduct = () => {
           <select
             name='category'
             id='category'
-            value={fetchingProduct ? 'Loading...' : formData?.category}
             onChange={handleInputChange}
             required
             className='mt-4 h-10 rounded-lg px-4 focus:outline-offset-1'
@@ -88,7 +80,6 @@ const EditProduct = () => {
             id='stock'
             autoComplete='stock'
             required
-            value={fetchingProduct ? 'Loading...' : formData?.stock}
             onChange={handleInputChange}
             className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
           />
@@ -103,7 +94,6 @@ const EditProduct = () => {
             id='price'
             autoComplete='price'
             required
-            value={fetchingProduct ? 'Loading...' : formData?.price}
             onChange={handleInputChange}
             className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
           />

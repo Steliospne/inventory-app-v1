@@ -9,6 +9,9 @@ import Root from './home/Root';
 import Products from './products/Products';
 import ErrorBoundary from './components/ErrorBoundary';
 import EditProduct, { action as editAction } from './components/EditProduct';
+import NewProduct, {
+  action as createProductAction,
+} from './components/NewProduct';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -40,6 +43,11 @@ const App = () => {
                 path: '/edit/products/:productId',
                 element: <EditProduct />,
                 action: editAction,
+              },
+              {
+                path: '/newProduct',
+                element: <NewProduct />,
+                action: createProductAction,
               },
             ],
           },

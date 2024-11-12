@@ -15,6 +15,7 @@ export const getProducts = async () => {
     ORDER BY 
       pc.name, p.name;
   `;
+
   const { rows } = await pool.query(query);
 
   return rows;
@@ -38,6 +39,7 @@ export const getProduct = async (id) => {
       pc.name, p.name;
   `;
   const values = [id];
+
   const { rows } = await pool.query(query, values);
 
   return rows;
@@ -47,10 +49,41 @@ export const getCategories = async () => {
   const query = `
     SELECT name, id FROM product_categories;
   `;
+
   const { rows } = await pool.query(query);
 
   return rows;
 };
+
+export const createNewProduct = async (product) => {
+  const query = `
+    INSERT INTO products
+    (name, category_id, current_stock, selling_price)
+    VALUES ($1, (SELECT id FROM product_categories WHERE name = $2), $3, $4);
+  `;
+
+  const values = [
+    product.product,
+    product.category,
+    product.stock,
+    product.price,
+  ];
+
+  await pool.query(query, values);
+};
+
+export const deleteProduct = async (id) => {
+  const query = `
+    DELETE FROM products
+    WHERE id = $1;
+
+  `;
+
+  const values = [id];
+
+  await pool.query(query, values);
+};
+
 export const updateProduct = async (id, product) => {
   const query = `
     UPDATE products
@@ -62,6 +95,7 @@ export const updateProduct = async (id, product) => {
     WHERE 
       id = $5;
   `;
+
   const values = [
     product.product,
     product.category,
@@ -69,5 +103,6 @@ export const updateProduct = async (id, product) => {
     product.price,
     id,
   ];
-  await pool.query(query, values);
+
+  return await pool.query(query, values);
 };
