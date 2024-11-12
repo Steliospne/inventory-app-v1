@@ -1,6 +1,6 @@
 
 import { PanelTopClose, PanelTopOpen } from 'lucide-react';
-import { fetchSuppliers, fetchCategories } from '../../lib/data.js';
+import { fetchSuppliers, fetchCategories } from '../lib/data.js';
 import {
   createColumnHelper,
   flexRender,
