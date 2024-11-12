@@ -1,5 +1,5 @@
 import { CirclePlus, Trash2, Pencil } from 'lucide-react';
-import { fetchProducts, deleteProduct } from '../../lib/data.js';
+import { fetchProducts, deleteProduct } from '../lib/data.js';
 import {
   createColumnHelper,
   flexRender,

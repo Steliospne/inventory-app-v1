@@ -1,5 +1,22 @@
 import pool from './pool.js';
 
+export const createNewProduct = async (product) => {
+  const query = `
+    INSERT INTO products
+    (name, category_id, current_stock, selling_price)
+    VALUES ($1, (SELECT id FROM product_categories WHERE name = $2), $3, $4);
+  `;
+
+  const values = [
+    product.product,
+    product.category,
+    product.stock,
+    product.price,
+  ];
+
+  await pool.query(query, values);
+};
+
 export const getProducts = async () => {
   const query = `
     SELECT
@@ -45,33 +62,6 @@ export const getProduct = async (id) => {
   return rows;
 };
 
-export const getCategories = async () => {
-  const query = `
-    SELECT name, id FROM product_categories;
-  `;
-
-  const { rows } = await pool.query(query);
-
-  return rows;
-};
-
-export const createNewProduct = async (product) => {
-  const query = `
-    INSERT INTO products
-    (name, category_id, current_stock, selling_price)
-    VALUES ($1, (SELECT id FROM product_categories WHERE name = $2), $3, $4);
-  `;
-
-  const values = [
-    product.product,
-    product.category,
-    product.stock,
-    product.price,
-  ];
-
-  await pool.query(query, values);
-};
-
 export const deleteProduct = async (id) => {
   const query = `
     DELETE FROM products
@@ -105,4 +95,50 @@ export const updateProduct = async (id, product) => {
   ];
 
   return await pool.query(query, values);
+};
+
+export const createNewCategory = async (category) => {
+  const query = `
+    INSERT INTO product_categories (name)
+    VALUES ($1);
+  `;
+
+  const values = [category];
+
+  await pool.query(query, values);
+};
+
+export const getCategories = async () => {
+  const query = `
+    SELECT name, id FROM product_categories;
+  `;
+
+  const { rows } = await pool.query(query);
+
+  return rows;
+};
+
+export const updateCategory = async (id, product) => {
+  const query = `
+    UPDATE product_categories
+    SET 
+      name = $2
+    WHERE 
+      id = $1;
+  `;
+
+  const values = [id, product];
+
+  return await pool.query(query, values);
+};
+
+export const deleteCategory = async (id) => {
+  const query = `
+    DELETE FROM product_categories
+    WHERE id = $1;
+  `;
+
+  const values = [id];
+
+  await pool.query(query, values);
 };

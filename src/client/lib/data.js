@@ -48,23 +48,6 @@ export const fetchProduct = (id) => {
   };
 };
 
-export const fetchCategories = () => {
-  const { isPending, error, data, isFetching } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const response = await axios.get('http://localhost:3000/api/categories');
-      return response.data;
-    },
-  });
-
-  return {
-    pendingCategories: isPending,
-    categoryError: error,
-    categoryData: data,
-    fetchingCategories: isFetching,
-  };
-};
-
 export const updateProduct = async (id, product) => {
   try {
     const response = await axios.put(
@@ -83,6 +66,62 @@ export const deleteProduct = async (id) => {
   try {
     const response = await axios.delete(
       `http://localhost:3000/api/delete/products/${id}`,
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createNewCategory = async (category) => {
+  try {
+    const response = await axios.post(`http://localhost:3000/api/newCategory`, {
+      category,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchCategories = () => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await axios.get('http://localhost:3000/api/categories');
+      return response.data;
+    },
+  });
+
+  return {
+    pendingCategories: isPending,
+    categoryError: error,
+    categoryData: data,
+    fetchingCategories: isFetching,
+  };
+};
+
+export const deleteCategory = async (id) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:3000/api/delete/categories/${id}`,
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateCategory = async (category) => {
+  try {
+    const id = category.id;
+    const newCategory = category.value;
+
+    const response = await axios.put(
+      `http://localhost:3000/api/categories/${id}`,
+      {
+        category: newCategory,
+      },
     );
     return response;
   } catch (error) {

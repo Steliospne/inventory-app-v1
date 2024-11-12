@@ -6,6 +6,9 @@ import {
   updateProduct,
   createNewProduct,
   deleteProduct,
+  createNewCategory,
+  deleteCategory,
+  updateCategory,
 } from '../db/queries.js';
 
 export const apiRouter = Router();
@@ -23,14 +26,58 @@ apiRouter.get('/api/products/:productId', async (req, res) => {
 
 apiRouter.post('/api/newProduct', async (req, res) => {
   const { product } = req.body;
-  await createNewProduct(product);
+  const categories = await getCategories();
+  const found = categories.find(
+    (category) => category.name.toLowerCase() == product.category.toLowerCase(),
+  );
+
+  if (found) {
+    await createNewProduct(product);
+  } else {
+    await createNewCategory(product.category);
+    await createNewProduct(product);
+  }
+  console.log(product, categories);
   res.send();
 });
 
 apiRouter.put('/api/products/:productId', async (req, res) => {
   const productId = req.params.productId;
   const { product } = req.body;
-  await updateProduct(productId, product);
+  const categories = await getCategories();
+  const found = categories.find(
+    (category) => category.name.toLowerCase() == product.category.toLowerCase(),
+  );
+
+  if (found) {
+    await updateProduct(productId, product);
+  } else {
+    await createNewCategory(product.category);
+    await updateProduct(productId, product);
+  }
+
+  res.send();
+});
+
+apiRouter.post('/api/newCategory', async (req, res) => {
+  const { category } = req.body;
+  await createNewCategory(category);
+  console.log(category);
+  res.send();
+});
+
+apiRouter.put('/api/categories/:categoryId', async (req, res) => {
+  const { categoryId } = req.params;
+  const { category } = req.body;
+
+  await updateCategory(categoryId, category);
+
+  res.send();
+});
+
+apiRouter.delete('/api/delete/categories/:categoryId', async (req, res) => {
+  const { categoryId } = req.params;
+  await deleteCategory(categoryId);
   res.send();
 });
 

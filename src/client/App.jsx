@@ -12,6 +12,7 @@ import EditProduct, { action as editAction } from './components/EditProduct';
 import NewProduct, {
   action as createProductAction,
 } from './components/NewProduct';
+import Categories from './components/Categories';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -34,6 +35,10 @@ const App = () => {
               {
                 path: '/dashboard',
                 element: <Dashboard />,
+              },
+              {
+                path: '/categories',
+                element: <Categories />,
               },
               {
                 path: '/products',
