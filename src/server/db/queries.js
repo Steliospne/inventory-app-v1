@@ -142,3 +142,20 @@ export const deleteCategory = async (id) => {
 
   await pool.query(query, values);
 };
+
+export const getSuppliers = async () =>{
+  const query = `
+  SELECT
+  s.id AS id,
+  s.name AS supplier,
+  s.email AS email,
+  s.phone AS phone
+  FROM
+  suppliers s
+  ORDER BY
+  s.name;
+  `
+  const { rows } = await pool.query(query);
+
+  return rows;
+}

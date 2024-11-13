@@ -21,6 +21,12 @@ const Sidebar = () => {
       >
         Products
       </NavLink>
+      <NavLink
+        to='/suppliers'
+        className='w-full hover:rounded-lg hover:bg-emerald-200 px-2 py-3'
+      >
+        Suppliers
+      </NavLink>
     </aside>
   );
 };

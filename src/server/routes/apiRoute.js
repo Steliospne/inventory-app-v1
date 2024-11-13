@@ -3,6 +3,7 @@ import {
   getProduct,
   getProducts,
   getCategories,
+  getSuppliers,
   updateProduct,
   createNewProduct,
   deleteProduct,
@@ -92,9 +93,14 @@ apiRouter.get('/api/categories', async (req, res) => {
   res.send(categories);
 });
 
+apiRouter.get('/api/suppliers', async (req, res) => {
+  const suppliers = await getSuppliers();
+  res.send(suppliers);
+});
+
 apiRouter.get('/api/*', (req, res) => {
   // Define valid routes
-  const validRoutes = ['/api/products', '/api/categories'];
+  const validRoutes = ['/api/products', '/api/categories', '/api/suppliers'];
 
   // Check if the requested path matches any valid route
   if (!validRoutes.includes(req.path)) {

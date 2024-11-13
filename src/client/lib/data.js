@@ -128,3 +128,20 @@ export const updateCategory = async (category) => {
     throw error;
   }
 };
+
+export const fetchSuppliers = () => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async () => {
+      const response = await axios.get('http://localhost:3000/api/suppliers');
+      return response.data;
+    },
+  });
+
+  return {
+    pendingSuppliers: isPending,
+    supplierError: error,
+    supplierData: data,
+    fetchingSuppliers: isFetching,
+  };
+};

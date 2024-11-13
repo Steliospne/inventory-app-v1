@@ -7,6 +7,7 @@ import { AuthContext } from './contexts/AuthContext';
 import { loader as loginLoader } from './auth/Login';
 import Root from './home/Root';
 import Products from './products/Products';
+import Suppliers from './suppliers/Suppliers';
 import ErrorBoundary from './components/ErrorBoundary';
 import EditProduct, { action as editAction } from './components/EditProduct';
 import NewProduct, {
@@ -43,6 +44,10 @@ const App = () => {
               {
                 path: '/products',
                 element: <Products />,
+              },
+              {
+                path: '/suppliers',
+                element: <Suppliers />,
               },
               {
                 path: '/edit/products/:productId',
