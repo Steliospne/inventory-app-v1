@@ -159,3 +159,73 @@ export const getSuppliers = async () =>{
 
   return rows;
 }
+
+export const getSupplier = async (id) =>{
+  const query = `
+  SELECT
+  s.id AS id,
+  s.name AS supplier,
+  s.email AS email,
+  s.phone AS phone
+  FROM
+  suppliers s
+  WHERE 
+  s.id = $1
+  ORDER BY
+  s.name;
+  `
+  const values = [id];
+  const { rows } = await pool.query(query,values);
+
+  return rows;
+}
+
+
+export const createNewSupplier = async (supplier) => {
+  const query = `
+    INSERT INTO suppliers
+    (name, email, phone)
+    VALUES ($1, $2, $3);
+  `;
+
+  const values = [
+    supplier.supplier,
+    supplier.email,
+    supplier.phone,
+  ];
+  console.log(values)
+  await pool.query(query, values);
+};
+
+export const updateSupplier = async (id, supplier) => {
+  const query = `
+    UPDATE suppliers
+    SET 
+      name = $1,
+      email = $2,
+      phone = $3
+    WHERE 
+      id = $4;
+  `;
+
+  const values = [
+    supplier.supplier,
+    supplier.email,
+    supplier.phone,
+    id,
+  ];
+
+  return await pool.query(query, values);
+};
+
+export const deleteSupplier = async (id) => {
+  const query = `
+    DELETE FROM suppliers
+    WHERE id = $1;
+
+  `;
+
+  const values = [id];
+
+  await pool.query(query, values);
+};

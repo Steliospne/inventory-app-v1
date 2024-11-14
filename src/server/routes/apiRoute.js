@@ -3,10 +3,14 @@ import {
   getProduct,
   getProducts,
   getCategories,
+  getSupplier,
   getSuppliers,
   updateProduct,
+  updateSupplier,
   createNewProduct,
+  createNewSupplier,
   deleteProduct,
+  deleteSupplier,
   createNewCategory,
   deleteCategory,
   updateCategory,
@@ -96,6 +100,32 @@ apiRouter.get('/api/categories', async (req, res) => {
 apiRouter.get('/api/suppliers', async (req, res) => {
   const suppliers = await getSuppliers();
   res.send(suppliers);
+});
+apiRouter.get('/api/suppliers/:supplierId', async (req, res) => {
+  const supplierId = req.params.supplierId;
+  const [suppliers] = await getSupplier(supplierId);
+  res.send(suppliers);
+});
+
+apiRouter.post('/api/newSupplier', async (req, res) => {
+  const { supplier } = req.body;
+  await createNewSupplier(supplier);
+  console.log(supplier);
+  res.send();
+});
+
+apiRouter.put('/api/suppliers/:supplierId', async (req, res) => {
+  const supplierId = req.params.supplierId;
+  const { supplier } = req.body;
+  await updateSupplier(supplierId, supplier);
+
+  res.send();
+});
+
+apiRouter.delete('/api/delete/suppliers/:supplierId', async (req, res) => {
+  const supplierId = req.params.supplierId;
+  await deleteSupplier(supplierId);
+  res.send();
 });
 
 apiRouter.get('/api/*', (req, res) => {

@@ -13,6 +13,10 @@ import EditProduct, { action as editAction } from './components/EditProduct';
 import NewProduct, {
   action as createProductAction,
 } from './components/NewProduct';
+import EditSupplier, { action as editSupplierAction } from './components/EditSupplier';
+import NewSupplier, {
+  action as createSupplierAction,
+} from './components/NewSupplier';
 import Categories from './components/Categories';
 
 const App = () => {
@@ -58,6 +62,16 @@ const App = () => {
                 path: '/newProduct',
                 element: <NewProduct />,
                 action: createProductAction,
+              },
+              {
+                path: '/newSupplier',
+                element: <NewSupplier />,
+                action: createSupplierAction,
+              },
+              {
+                path: '/edit/suppliers/:supplierId',
+                element: <EditSupplier />,
+                action: editSupplierAction,
               },
             ],
           },

@@ -145,3 +145,58 @@ export const fetchSuppliers = () => {
     fetchingSuppliers: isFetching,
   };
 };
+
+export const fetchSupplier = (id) => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['supplier', id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `http://localhost:3000/api/suppliers/${id}`,
+      );
+      return response.data;
+    },
+  });
+
+  return {
+    pendingSupplier: isPending,
+    supplierError: error,
+    supplierData: data,
+    fetchingSupplier: isFetching,
+  };
+};
+
+export const updateSupplier = async (id, supplier) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:3000/api/suppliers/${id}`,
+      {
+        supplier,
+      },
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createNewSupplier = async (supplier) => {
+  try {
+    const response = await axios.post(`http://localhost:3000/api/newSupplier`, {
+      supplier,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteSupplier = async (id) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:3000/api/delete/suppliers/${id}`,
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
