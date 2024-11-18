@@ -1,3 +1,4 @@
+import Input from '../components/Input';
 import { formErrors } from '../lib/errorUtil';
 import { Form, useLoaderData } from 'react-router-dom';
 
@@ -14,32 +15,9 @@ const Login = () => {
         method='post'
         className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
       >
-        <div className='flex flex-col'>
-          <label htmlFor='username' className='text-lg font-medium'>
-            Email
-          </label>
-          <input
-            type='email'
-            name='username'
-            id='username'
-            autoComplete='username'
-            required
-            className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
-          />
-        </div>
+        <Input type='email' id='username' LabelText='Email:' />
         {message?.username && formErrors(message.username)}
-        <div className='mt-4 flex flex-col'>
-          <label htmlFor='password' className='text-lg font-medium'>
-            Password
-          </label>
-          <input
-            type='password'
-            name='password'
-            id='password'
-            required
-            className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
-          />
-        </div>
+        <Input type='password' id='password' LabelText='Password:' />
         {message?.password && formErrors(message.password)}
         <button
           type='submit'

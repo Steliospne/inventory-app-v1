@@ -116,7 +116,7 @@ const Products = () => {
               {table.getRowModel().rows.map((row, index) => (
                 <tr
                   key={row.id}
-                  className={`${index % 2 ? 'bg-emerald-50' : ''}`}
+                  className={`${index % 2 ? 'bg-emerald-50' : ''} hover:bg-zinc-100`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td

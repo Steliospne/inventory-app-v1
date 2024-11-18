@@ -9,14 +9,16 @@ import Root from './home/Root';
 import Products from './products/Products';
 import Suppliers from './suppliers/Suppliers';
 import ErrorBoundary from './components/ErrorBoundary';
-import EditProduct, { action as editAction } from './components/EditProduct';
+import EditProduct, { action as editAction } from './products/EditProduct';
 import NewProduct, {
   action as createProductAction,
-} from './components/NewProduct';
-import EditSupplier, { action as editSupplierAction } from './components/EditSupplier';
+} from './products/NewProduct';
+import EditSupplier, {
+  action as editSupplierAction,
+} from './suppliers/EditSupplier';
 import NewSupplier, {
   action as createSupplierAction,
-} from './components/NewSupplier';
+} from './suppliers/NewSupplier';
 import Categories from './components/Categories';
 
 const App = () => {
