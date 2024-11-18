@@ -22,6 +22,8 @@ app.use((err, req, res, next) => {
   res.status(500);
 });
 
+console.log(process.env.NODE_ENV);
+
 ViteExpress.listen(app, 3000, () =>
   console.log(`Server is listening on port ${PORT}...`),
 );
