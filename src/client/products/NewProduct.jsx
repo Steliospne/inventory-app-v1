@@ -25,7 +25,6 @@ const EditProduct = () => {
       ...formData,
       [field]: value,
     });
-    console.log(formData);
   };
 
   const [options, setOptions] = useState(categoryData);
@@ -85,6 +84,7 @@ const EditProduct = () => {
             id='product'
             LabelText='Product name:'
             onChange={handleInputChange}
+            value={formData.product}
           />
 
           {/* {message?.username && formErrors(message.username)} */}
@@ -108,8 +108,14 @@ const EditProduct = () => {
             type='tel'
             LabelText='Stock:'
             onChange={handleInputChange}
+            value={formData.stock}
           />
-          <Input id='price' LabelText='Price:' onChange={handleInputChange} />
+          <Input
+            id='price'
+            LabelText='Price:'
+            onChange={handleInputChange}
+            value={formData.price}
+          />
           <div className='flex gap-6'>
             <button
               type='submit'

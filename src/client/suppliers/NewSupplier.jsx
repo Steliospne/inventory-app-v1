@@ -32,6 +32,7 @@ const EditSupplier = () => {
         <Input
           id='supplier'
           LabelText='Supplier name:'
+          value={formData.supplier}
           onChange={handleInputChange}
         />
         {/* {message?.username && formErrors(message.username)} */}
@@ -39,12 +40,14 @@ const EditSupplier = () => {
           id='email'
           type='email'
           LabelText='Email:'
+          value={formData.email}
           onChange={handleInputChange}
         />
         <Input
           type='tel'
           id='phone'
           LabelText='Phone:'
+          value={formData.phone}
           onChange={handleInputChange}
         />
 

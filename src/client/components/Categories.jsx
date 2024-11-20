@@ -13,6 +13,8 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CirclePlus, Trash2, Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import NewCategory from '../categories/NewCategory';
+import EditCategory from '../categories/EditCategory';
 
 const columnHelper = createColumnHelper();
 
@@ -229,85 +231,20 @@ const Categories = () => {
                 ))}
               </tfoot>
             </table>
-            <div className={` ${openEditForm ? 'flex' : 'hidden'}`}>
-              <div className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'>
-                <label htmlFor='newCategory' className='text-lg font-medium'>
-                  New Category:
-                </label>
-                <input
-                  type='text'
-                  id='newCategory'
-                  name='newCategory'
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className='h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
-                />
-                <div className='flex items-center justify-center gap-2'>
-                  <button
-                    className='flex-1 rounded-lg bg-emerald-300 py-2 font-semibold hover:bg-emerald-200'
-                    onClick={async () => {
-                      try {
-                        await creationMutation.mutateAsync(newCategory);
-                        setNewCategory('');
-                        setOpenEditForm(!openEditForm);
-                      } catch (error) {
-                        console.error('Error creating category:', error);
-                      }
-                    }}
-                  >
-                    Submit
-                  </button>
-                  <button
-                    onClick={() => setOpenEditForm(!openEditForm)}
-                    className='flex-1 rounded-lg bg-red-400 py-2 font-semibold hover:bg-red-300'
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className={` ${openUpdateForm ? 'flex' : 'hidden'}`}>
-              <div className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'>
-                <label htmlFor='updateCategory' className='text-lg font-medium'>
-                  Update Category:
-                </label>
-                <input
-                  type='text'
-                  id='updateCategory'
-                  name='updateCategory'
-                  value={updatedCategory.value}
-                  onChange={(e) =>
-                    setUpdatedCategory({
-                      ...updatedCategory,
-                      value: e.target.value,
-                    })
-                  }
-                  className='h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
-                />
-                <div className='flex items-center justify-center gap-2'>
-                  <button
-                    className='flex-1 rounded-lg bg-emerald-300 py-2 font-semibold hover:bg-emerald-200'
-                    onClick={async () => {
-                      try {
-                        await updateMutation.mutateAsync(updatedCategory);
-                        setUpdatedCategory({ id: '', value: '' });
-                        setOpenUpdateForm(!openUpdateForm);
-                      } catch (error) {
-                        console.error('Error updating category:', error);
-                      }
-                    }}
-                  >
-                    Submit
-                  </button>
-                  <button
-                    onClick={() => setOpenUpdateForm(!openUpdateForm)}
-                    className='flex-1 rounded-lg bg-red-400 py-2 font-semibold hover:bg-red-300'
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
+            <NewCategory
+              newCategory={newCategory}
+              setNewCategory={setNewCategory}
+              openEditForm={openEditForm}
+              setOpenEditForm={setOpenEditForm}
+              creationMutation={creationMutation}
+            />
+            <EditCategory
+              updatedCategory={updatedCategory}
+              setUpdatedCategory={setUpdatedCategory}
+              openUpdateForm={openUpdateForm}
+              setOpenUpdateForm={setOpenUpdateForm}
+              updateMutation={updateMutation}
+            />
           </div>
         </div>
       )

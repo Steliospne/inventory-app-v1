@@ -10,6 +10,7 @@ const Input = ({
   autoComplete = id,
   onChange,
   LabelText,
+  value = '',
 }) => {
   return (
     <div className='flex flex-col'>
@@ -23,6 +24,7 @@ const Input = ({
         autoComplete={autoComplete}
         onChange={onChange && onChange}
         required={required}
+        value={value}
         className='mt-4 h-10 rounded-lg border border-emerald-300 p-2 px-4 py-5 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50'
       />
     </div>

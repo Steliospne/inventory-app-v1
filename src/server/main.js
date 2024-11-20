@@ -6,6 +6,7 @@ import { userRouter } from './routes/userRouter.js';
 import { apiRouter } from './routes/apiRoute.js';
 
 const PORT = process.env.PORT || '3000';
+const HOST = `http://localhost:${PORT}`;
 
 const app = express();
 
@@ -24,6 +25,6 @@ app.use((err, req, res, next) => {
 
 console.log(process.env.NODE_ENV);
 
-ViteExpress.listen(app, 3000, () =>
-  console.log(`Server is listening on port ${PORT}...`),
+ViteExpress.listen(app, PORT, () =>
+  console.log(`Server is listening on port ${PORT}...`, `----> ${HOST}`),
 );
