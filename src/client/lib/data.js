@@ -200,3 +200,25 @@ export const deleteSupplier = async (id) => {
     throw error;
   }
 };
+
+export const fetchInventoryMovements = () => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['inv-move'],
+    queryFn: async () => {
+      const response = await axios.get(
+        'http://localhost:3000/get/inventory-movement',
+      );
+
+      return response.data.map((el) => {
+        const copy = { ...el, month: el.month.split('T')[0] };
+        return copy;
+      });
+    },
+  });
+  return {
+    pendingInvMovement: isPending,
+    errorInvMovement: error,
+    invMovementData: data,
+    fetchingInvMovement: isFetching,
+  };
+};

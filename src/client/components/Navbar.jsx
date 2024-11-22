@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 const Navbar = ({ user, logoutAction }) => {
   return (
-    <header className='col-start-2 flex justify-end bg-zinc-200 px-2 py-1 drop-shadow dark:bg-zinc-800 dark:text-white'>
+    <header className='sticky top-0 col-start-2 flex justify-end bg-zinc-200 px-2 py-1 drop-shadow dark:bg-zinc-800 dark:text-white'>
       <nav className='flex gap-6 text-xl font-semibold'>
         <NavLink
           to='/'

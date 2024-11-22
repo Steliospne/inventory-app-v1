@@ -1,10 +1,13 @@
-const FeatureCard = ({ icon, title, description }) => {
+const FeatureCard = ({ icon, title, description, children }) => {
   return (
-    <div className='bg-white p-6 rounded-lg shadow-md'>
-      <div className='flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-full mb-4'>
-        {icon}
-      </div>
-      <h3 className='text-lg font-semibold text-gray-900 mb-2'>{title}</h3>
+    <div className='rounded-lg bg-white p-6 shadow-md'>
+      {icon && (
+        <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100'>
+          {icon}
+        </div>
+      )}
+      <h3 className='mb-2 text-lg font-semibold text-gray-900'>{title}</h3>
+      {children}
       <p className='text-gray-600'>{description}</p>
     </div>
   );

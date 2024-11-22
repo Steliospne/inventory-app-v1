@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Input from '../components/Input';
 import { formErrors } from '../lib/errorUtil';
 import { Form, useLoaderData } from 'react-router-dom';
@@ -8,16 +9,38 @@ export const loader = async ({ params }) => {
 
 const Login = () => {
   const { message } = useLoaderData();
-  console.log(message);
+  const [formData, setFormData] = useState('');
+
+  const handleInputChange = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+  };
   return (
-    <div className='flex h-full items-center justify-center'>
+    <div className='flex min-h-screen items-center justify-center'>
       <Form
         method='post'
         className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
       >
-        <Input type='email' id='username' LabelText='Email:' />
+        <Input
+          type='email'
+          id='username'
+          LabelText='Email:'
+          value={formData.username}
+          onChange={handleInputChange}
+        />
         {message?.username && formErrors(message.username)}
-        <Input type='password' id='password' LabelText='Password:' />
+        <Input
+          type='password'
+          id='password'
+          LabelText='Password:'
+          value={formData.password}
+          onChange={handleInputChange}
+        />
         {message?.password && formErrors(message.password)}
         <button
           type='submit'
