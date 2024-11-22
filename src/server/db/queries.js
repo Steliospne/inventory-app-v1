@@ -143,7 +143,7 @@ export const deleteCategory = async (id) => {
   await pool.query(query, values);
 };
 
-export const getSuppliers = async () =>{
+export const getSuppliers = async () => {
   const query = `
   SELECT
   s.id AS id,
@@ -154,13 +154,13 @@ export const getSuppliers = async () =>{
   suppliers s
   ORDER BY
   s.name;
-  `
+  `;
   const { rows } = await pool.query(query);
 
   return rows;
-}
+};
 
-export const getSupplier = async (id) =>{
+export const getSupplier = async (id) => {
   const query = `
   SELECT
   s.id AS id,
@@ -173,13 +173,12 @@ export const getSupplier = async (id) =>{
   s.id = $1
   ORDER BY
   s.name;
-  `
+  `;
   const values = [id];
-  const { rows } = await pool.query(query,values);
+  const { rows } = await pool.query(query, values);
 
   return rows;
-}
-
+};
 
 export const createNewSupplier = async (supplier) => {
   const query = `
@@ -188,12 +187,8 @@ export const createNewSupplier = async (supplier) => {
     VALUES ($1, $2, $3);
   `;
 
-  const values = [
-    supplier.supplier,
-    supplier.email,
-    supplier.phone,
-  ];
-  console.log(values)
+  const values = [supplier.supplier, supplier.email, supplier.phone];
+  console.log(values);
   await pool.query(query, values);
 };
 
@@ -208,12 +203,7 @@ export const updateSupplier = async (id, supplier) => {
       id = $4;
   `;
 
-  const values = [
-    supplier.supplier,
-    supplier.email,
-    supplier.phone,
-    id,
-  ];
+  const values = [supplier.supplier, supplier.email, supplier.phone, id];
 
   return await pool.query(query, values);
 };
@@ -228,4 +218,31 @@ export const deleteSupplier = async (id) => {
   const values = [id];
 
   await pool.query(query, values);
+};
+
+export const getInventoryMovements = async () => {
+  const query = `
+  WITH monthly_transactions AS (
+    SELECT 
+      DATE_TRUNC('month', transaction_date) as month,
+      transaction_type,
+    CASE 
+      WHEN transaction_type = 'used' THEN SUM(quantity * COALESCE(unit_price, 0)) * -1
+      ELSE SUM(quantity * COALESCE(unit_price, 0))
+      END as total_value
+    FROM inventory_transactions
+    WHERE unit_price IS NOT NULL
+    GROUP BY 1, 2
+  )
+  SELECT 
+    month,
+    MAX(CASE WHEN transaction_type = 'received' THEN total_value ELSE 0 END) as purchase,
+    ABS(MAX(CASE WHEN transaction_type = 'used' THEN total_value ELSE 0 END)) as usage
+  FROM monthly_transactions
+  GROUP BY month
+  ORDER BY month;
+  `;
+
+  const { rows } = await pool.query(query);
+  return rows;
 };

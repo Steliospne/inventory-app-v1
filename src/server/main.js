@@ -4,6 +4,7 @@ import ViteExpress from 'vite-express';
 import cors from 'cors';
 import { userRouter } from './routes/userRouter.js';
 import { apiRouter } from './routes/apiRoute.js';
+import { dashBoardRouter } from './routes/dashboardRoute.js';
 
 const PORT = process.env.PORT || '3000';
 const HOST = `http://localhost:${PORT}`;
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use('/', userRouter);
 app.use('/', apiRouter);
+app.use('/', dashBoardRouter);
 
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
