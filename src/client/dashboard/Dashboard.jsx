@@ -16,7 +16,13 @@ import {
   Cell,
 } from 'recharts';
 import FeatureCard from '../components/FeatureCard';
-import { fetchInventoryMovements, fetchTurnOverRate } from '../lib/data.js';
+import {
+  fetchInventoryMovements,
+  fetchTopMovingIngredients,
+  fetchTurnOverRate,
+} from '../lib/data.js';
+
+import CustomPieLabel from '../components/CustomPieLabel';
 
 const Dashboard = () => {
   const sampleTopIngredients = [
@@ -41,7 +47,13 @@ const Dashboard = () => {
     { month: '2024-03', avg_price: 95, deviation: 8 },
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  const COLORS = [
+    '#FF6B6B', // coral red
+    '#4ECDC4', // turquoise
+    '#45B7D1', // sky blue
+    '#96CEB4', // sage green
+    '#FFEEAD', // soft yellow
+  ];
 
   const {
     pendingInvMovement,
@@ -56,6 +68,13 @@ const Dashboard = () => {
     dataTurnOverRate,
     fetchingTurnOverRate,
   } = fetchTurnOverRate();
+
+  const {
+    pendingTopMovingIngredients,
+    errorTopMovingIngredients,
+    dataTopMovingIngredients,
+    fetchingTopMovingIngredients,
+  } = fetchTopMovingIngredients();
 
   return (
     <div className='flex flex-col gap-4 p-4'>
@@ -105,20 +124,41 @@ const Dashboard = () => {
           <ResponsiveContainer width='100%' height='100%'>
             <PieChart>
               <Pie
-                data={sampleTopIngredients}
-                dataKey='value'
+                data={dataTopMovingIngredients && dataTopMovingIngredients}
+                dataKey='total_quantity_moved'
                 nameKey='name'
-                cx='50%'
+                cx='75%'
                 cy='50%'
                 outerRadius={80}
-                label
+                label={
+                  <CustomPieLabel textLabel='Quantity: ' colors={COLORS} />
+                }
               >
-                {sampleTopIngredients.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
+                {dataTopMovingIngredients &&
+                  dataTopMovingIngredients.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+              </Pie>
+              <Pie
+                data={dataTopMovingIngredients && dataTopMovingIngredients}
+                dataKey='total_value_moved'
+                nameKey='name'
+                cx='25%'
+                cy='50%'
+                outerRadius={80}
+                label={<CustomPieLabel textLabel='Value: ' colors={COLORS} />}
+                legendType='none'
+              >
+                {dataTopMovingIngredients &&
+                  dataTopMovingIngredients.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
               </Pie>
               <Tooltip />
               <Legend />

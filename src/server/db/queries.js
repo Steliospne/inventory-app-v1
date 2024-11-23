@@ -271,3 +271,21 @@ export const getTurnOverRate = async () => {
   const { rows } = await pool.query(query);
   return rows;
 };
+
+export const getTopMovingIngredients = async () => {
+  const query = `
+  SELECT 
+    i.name as name,
+    SUM(ABS(it.quantity)) as total_quantity_moved,
+    SUM(ABS(it.quantity * COALESCE(it.unit_price, 0))) as total_value_moved
+  FROM inventory_transactions it
+  JOIN ingredients i ON it.ingredient_id = i.id
+  GROUP BY i.name
+  ORDER BY total_quantity_moved DESC
+  LIMIT 5;
+  `;
+
+  const { rows } = await pool.query(query);
+
+  return rows;
+};
