@@ -1,3 +1,4 @@
+import { query } from 'express';
 import pool from './pool.js';
 
 export const createNewProduct = async (product) => {
@@ -243,6 +244,30 @@ export const getInventoryMovements = async () => {
   ORDER BY month;
   `;
 
+  const { rows } = await pool.query(query);
+  return rows;
+};
+
+export const getTurnOverRate = async () => {
+  const query = `
+  WITH monthly_movements AS (
+    SELECT 
+        DATE_TRUNC('month', transaction_date) as month,
+        ingredient_id,
+        SUM(CASE WHEN transaction_type = 'received' THEN quantity
+             ELSE 0 END) as purchased,
+        SUM(CASE WHEN transaction_type = 'used' THEN quantity
+             ELSE 0 END) as used
+    FROM inventory_transactions
+    GROUP BY 1, 2
+  )
+  SELECT 
+      month,
+      ROUND(SUM(used) / NULLIF(SUM(purchased), 0) * 100, 2) as turnover_rate
+  FROM monthly_movements
+  GROUP BY month
+  ORDER BY month;
+  `;
   const { rows } = await pool.query(query);
   return rows;
 };
