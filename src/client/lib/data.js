@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { dateYearMonthFormatter } from './lib';
 
 export const createNewProduct = async (product) => {
   try {
@@ -209,10 +210,7 @@ export const fetchInventoryMovements = () => {
         'http://localhost:3000/get/inventory-movement',
       );
 
-      return response.data.map((el) => {
-        const copy = { ...el, month: el.month.split('T')[0] };
-        return copy;
-      });
+      return response.data.map((el) => dateYearMonthFormatter(el));
     },
   });
   return {
@@ -220,5 +218,23 @@ export const fetchInventoryMovements = () => {
     errorInvMovement: error,
     invMovementData: data,
     fetchingInvMovement: isFetching,
+  };
+};
+
+export const fetchTurnOverRate = () => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['turnOverRate'],
+    queryFn: async () => {
+      const response = await axios.get(
+        'http://localhost:3000/get/turn-over-rate',
+      );
+      return response.data.map((el) => dateYearMonthFormatter(el));
+    },
+  });
+  return {
+    pendingTurnOverRate: isPending,
+    errorTurnOverRate: error,
+    dataTurnOverRate: data,
+    fetchingTurnOverRate: isFetching,
   };
 };
