@@ -16,22 +16,9 @@ import {
   Cell,
 } from 'recharts';
 import FeatureCard from '../components/FeatureCard';
-import { fetchInventoryMovements } from '../lib/data.js';
+import { fetchInventoryMovements, fetchTurnOverRate } from '../lib/data.js';
 
 const Dashboard = () => {
-  // Sample data structure - replace with actual data from your queries
-  const sampleMovementData = [
-    { month: '2024-01', purchase: 50000, usage: 45000 },
-    { month: '2024-02', purchase: 55000, usage: 48000 },
-    { month: '2024-03', purchase: 48000, usage: 52000 },
-  ];
-
-  const sampleTurnoverData = [
-    { month: '2024-01', turnover_rate: 85 },
-    { month: '2024-02', turnover_rate: 90 },
-    { month: '2024-03', turnover_rate: 88 },
-  ];
-
   const sampleTopIngredients = [
     { name: 'Flour', value: 2500 },
     { name: 'Sugar', value: 2000 },
@@ -63,12 +50,12 @@ const Dashboard = () => {
     fetchingInvMovement,
   } = fetchInventoryMovements();
 
-  console.log(
-    pendingInvMovement,
-    errorInvMovement,
-    invMovementData,
-    fetchingInvMovement,
-  );
+  const {
+    pendingTurnOverRate,
+    errorTurnOverRate,
+    dataTurnOverRate,
+    fetchingTurnOverRate,
+  } = fetchTurnOverRate();
 
   return (
     <div className='flex flex-col gap-4 p-4'>
@@ -91,10 +78,15 @@ const Dashboard = () => {
       <FeatureCard title='Inventory Turnover Rate'>
         <div className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>
-            <LineChart data={sampleTurnoverData}>
+            <LineChart data={dataTurnOverRate && dataTurnOverRate}>
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='month' />
-              <YAxis />
+              <YAxis
+                dataKey='turnover_rate'
+                type='number'
+                padding={{ bottom: 10 }}
+                domain={[-150, 0]}
+              />
               <Tooltip />
               <Line
                 type='monotone'
