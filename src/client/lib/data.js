@@ -238,3 +238,27 @@ export const fetchTurnOverRate = () => {
     fetchingTurnOverRate: isFetching,
   };
 };
+
+export const fetchTopMovingIngredients = () => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['topIngredients'],
+    queryFn: async () => {
+      const response = await axios.get(
+        'http://localhost:3000/get/top-moving-ingredients',
+      );
+      return response.data.map((el) => {
+        return {
+          ...el,
+          total_quantity_moved: Number(el.total_quantity_moved),
+          total_value_moved: Number(el.total_value_moved),
+        };
+      });
+    },
+  });
+  return {
+    pendingTopMovingIngredients: isPending,
+    errorTopMovingIngredients: error,
+    dataTopMovingIngredients: data,
+    fetchingTopMovingIngredients: isFetching,
+  };
+};
