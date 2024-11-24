@@ -1,5 +1,6 @@
 import Router from 'express';
 import {
+  getDailyStockMovement,
   getInventoryMovements,
   getTopMovingIngredients,
   getTurnOverRate,
@@ -18,5 +19,10 @@ dashBoardRouter.get('/get/turn-over-rate', async (req, res, next) => {
 
 dashBoardRouter.get('/get/top-moving-ingredients', async (req, res, next) => {
   const response = await getTopMovingIngredients();
+  res.send(response);
+});
+
+dashBoardRouter.get('/get/daily-movements', async (req, res, next) => {
+  const response = await getDailyStockMovement();
   res.send(response);
 });

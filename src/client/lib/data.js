@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { dateYearMonthFormatter } from './lib';
+import { dateYearMonthFormatter,mapDayOfWeek } from './lib';
 
 export const createNewProduct = async (product) => {
   try {
@@ -260,5 +260,23 @@ export const fetchTopMovingIngredients = () => {
     errorTopMovingIngredients: error,
     dataTopMovingIngredients: data,
     fetchingTopMovingIngredients: isFetching,
+  };
+};
+
+export const fetchDailyStockMovement = () => {
+  const { isPending, error, data, isFetching } = useQuery({
+    queryKey: ['dailyStockMovement'],
+    queryFn: async () => {
+      const response = await axios.get(
+        'http://localhost:3000/get/daily-movements',
+      );
+      return response.data.map((el) => mapDayOfWeek(el));
+    },
+  });
+  return {
+    pendingDailyStockMovement: isPending,
+    errorDailyStockMovement: error,
+    dataDailyStockMovement: data,
+    fetchingDailyStockMovement: isFetching,
   };
 };
