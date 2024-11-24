@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { dateYearMonthFormatter,mapDayOfWeek } from './lib';
+import { dateYearMonthFormatter, mapDayOfWeek } from './lib';
 
 export const createNewProduct = async (product) => {
   try {
@@ -210,7 +210,14 @@ export const fetchInventoryMovements = () => {
         'http://localhost:3000/get/inventory-movement',
       );
 
-      return response.data.map((el) => dateYearMonthFormatter(el));
+      return response.data.map((el) => {
+        return {
+          ...el,
+          month: dateYearMonthFormatter(el),
+          purchase: Number(el.purchase),
+          usage: Number(el.usage),
+        };
+      });
     },
   });
   return {
@@ -228,7 +235,13 @@ export const fetchTurnOverRate = () => {
       const response = await axios.get(
         'http://localhost:3000/get/turn-over-rate',
       );
-      return response.data.map((el) => dateYearMonthFormatter(el));
+      return response.data.map((el) => {
+        return {
+          ...el,
+          turnover_rate: Number(el.turnover_rate),
+          month: dateYearMonthFormatter(el),
+        };
+      });
     },
   });
   return {
@@ -270,7 +283,13 @@ export const fetchDailyStockMovement = () => {
       const response = await axios.get(
         'http://localhost:3000/get/daily-movements',
       );
-      return response.data.map((el) => mapDayOfWeek(el));
+      return response.data.map((el) => {
+        return {
+          ...el,
+          day_of_week: mapDayOfWeek(el),
+          transaction_count: Number(el.transaction_count),
+        };
+      });
     },
   });
   return {
