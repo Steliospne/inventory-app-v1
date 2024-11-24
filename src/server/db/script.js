@@ -91,15 +91,22 @@ class InventoryTransactionGenerator {
     return Math.random() * (max - min) + min;
   }
 
-  // Generate random date within last 6 months
-  randomDate() {
+  // Generate random period according to month offset provided
+  generatePeriod(monthOffset, numberOfDates) {
+    const period = [];
     const end = new Date();
     const start = new Date();
-    start.setMonth(start.getMonth() - 6);
+    start.setMonth(start.getMonth() - monthOffset);
 
-    return new Date(
-      start.getTime() + Math.random() * (end.getTime() - start.getTime()),
-    );
+    for (let i = 0; i < numberOfDates; i++) {
+      period.push(
+        new Date(
+          start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+        ),
+      );
+    }
+
+    return period.sort((a, b) => b - a);
   }
 
   // Calculate quantity based on transaction type
@@ -118,10 +125,11 @@ class InventoryTransactionGenerator {
 
   // Generate a single transaction
   generateTransaction() {
-    const ingredient =
-      this.suppliersIngredients[
-        Math.floor(Math.random() * this.suppliersIngredients.length)
-      ];
+    const supplierId = Math.floor(
+      Math.random() * this.suppliersIngredients.length,
+    );
+    const ingredient = this.suppliersIngredients[supplierId];
+
     const transactionType =
       this.transactionTypes[
         Math.floor(Math.random() * this.transactionTypes.length)
@@ -136,6 +144,8 @@ class InventoryTransactionGenerator {
         ? ingredient.unitPrice * this.random(0.95, 1.05)
         : ingredient.unitPrice;
 
+    this.suppliersIngredients[supplierId].unitPrice = unitPrice;
+
     return {
       ingredient: ingredient.ingredient,
       supplier: ingredient.supplier,
@@ -143,7 +153,7 @@ class InventoryTransactionGenerator {
       quantity: Number(quantity.toFixed(2)),
       unit_price: Number(unitPrice.toFixed(2)),
       unit: ingredient.unit,
-      transaction_date: this.randomDate(),
+      transaction_date: null,
       notes: this.generateNotes(transactionType, ingredient.supplier),
     };
   }
@@ -165,65 +175,15 @@ class InventoryTransactionGenerator {
   // Generate multiple transactions
   generateTransactions(count = 100) {
     const transactions = [];
+    const period = this.generatePeriod(6, count);
 
     for (let i = 0; i < count; i++) {
-      transactions.push(this.generateTransaction());
+      const transaction = this.generateTransaction();
+      transaction.transaction_date = period.pop();
+      transactions.push(transaction);
     }
 
-    // Sort by date
-    return transactions.sort((a, b) => a.transaction_date - b.transaction_date);
-  }
-
-  // Generate summary report
-  generateSummaryReport(transactions) {
-    const summary = {};
-
-    transactions.forEach((transaction) => {
-      const month = transaction.transaction_date.toLocaleString('default', {
-        month: 'long',
-        year: 'numeric',
-      });
-
-      if (!summary[month]) {
-        summary[month] = {
-          total_transactions: 0,
-          unique_ingredients: new Set(),
-          total_received: 0,
-          total_used: 0,
-          total_adjusted: 0,
-        };
-      }
-
-      summary[month].total_transactions++;
-      summary[month].unique_ingredients.add(transaction.ingredient);
-
-      switch (transaction.transaction_type) {
-        case 'received':
-          summary[month].total_received += transaction.quantity;
-          break;
-        case 'used':
-          summary[month].total_used += transaction.quantity;
-          break;
-        case 'adjusted':
-          summary[month].total_adjusted += transaction.quantity;
-          break;
-      }
-    });
-
-    // Convert Sets to counts and round numbers
-    Object.keys(summary).forEach((month) => {
-      summary[month].unique_ingredients =
-        summary[month].unique_ingredients.size;
-      summary[month].total_received = Number(
-        summary[month].total_received.toFixed(2),
-      );
-      summary[month].total_used = Number(summary[month].total_used.toFixed(2));
-      summary[month].total_adjusted = Number(
-        summary[month].total_adjusted.toFixed(2),
-      );
-    });
-
-    return summary;
+    return transactions;
   }
 }
 
@@ -243,7 +203,9 @@ const pool = new Pool({
 const generator = new InventoryTransactionGenerator();
 
 const fakeTransactions = async () => {
-  const transactions = generator.generateTransactions(100);
+  const transactions = generator.generateTransactions(1000);
+
+  await pool.query('TRUNCATE inventory_transactions RESTART IDENTITY CASCADE;');
 
   for (const transaction of transactions) {
     await pool.query(
@@ -264,3 +226,6 @@ const fakeTransactions = async () => {
 };
 
 fakeTransactions();
+
+// const transactions = generator.generateTransactions(20);
+// console.log(transactions);
