@@ -17,6 +17,7 @@ import {
 } from 'recharts';
 import FeatureCard from '../components/FeatureCard';
 import {
+  fetchDailyStockMovement,
   fetchInventoryMovements,
   fetchTopMovingIngredients,
   fetchTurnOverRate,
@@ -31,14 +32,6 @@ const Dashboard = () => {
     { name: 'Salt', value: 1500 },
     { name: 'Yeast', value: 1000 },
     { name: 'Butter', value: 800 },
-  ];
-
-  const sampleDayPatterns = [
-    { day: 'Mon', count: 45 },
-    { day: 'Tue', count: 50 },
-    { day: 'Wed', count: 35 },
-    { day: 'Thu', count: 40 },
-    { day: 'Fri', count: 55 },
   ];
 
   const samplePriceVolatility = [
@@ -75,6 +68,14 @@ const Dashboard = () => {
     dataTopMovingIngredients,
     fetchingTopMovingIngredients,
   } = fetchTopMovingIngredients();
+
+  const {
+    pendingDailyStockMovement,
+    errorDailyStockMovement,
+    dataDailyStockMovement,
+    fetchingDailyStockMovement,
+  } = fetchDailyStockMovement();
+
 
   return (
     <div className='flex flex-col gap-4 p-4'>
@@ -200,12 +201,12 @@ const Dashboard = () => {
       <FeatureCard title='Daily Stock Movement Patterns'>
         <div className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>
-            <BarChart data={sampleDayPatterns}>
+            <BarChart data={dataDailyStockMovement && dataDailyStockMovement}>
               <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='day' />
+              <XAxis dataKey='day_of_week'/>
               <YAxis />
               <Tooltip />
-              <Bar dataKey='count' fill='#8884d8' name='Transaction Count' />
+              <Bar dataKey='transaction_count' fill='#8884d8' name='Transaction Count' />
             </BarChart>
           </ResponsiveContainer>
         </div>

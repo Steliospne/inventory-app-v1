@@ -289,3 +289,20 @@ export const getTopMovingIngredients = async () => {
 
   return rows;
 };
+
+export const getDailyStockMovement = async () => {
+  const query = `
+  SELECT 
+    EXTRACT(DOW FROM transaction_date) as day_of_week,
+    COUNT(CASE 
+      WHEN transaction_type <> 'adjusted' 
+      THEN transaction_type
+      END) as transaction_count,
+    AVG(quantity) as avg_quantity_per_transaction
+  FROM inventory_transactions
+  GROUP BY 1
+  ORDER BY 1;
+  `;
+  const { rows } = await pool.query(query);
+  return rows;
+};
