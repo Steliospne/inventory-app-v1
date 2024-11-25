@@ -132,7 +132,9 @@ class InventoryTransactionGenerator {
 
     const transactionType =
       this.transactionTypes[
-        Math.floor(Math.random() * this.transactionTypes.length)
+        Math.random() < 0.85
+          ? Math.floor(Math.random() * (this.transactionTypes.length - 1))
+          : 2
       ];
 
     const quantity = this.calculateQuantity(
