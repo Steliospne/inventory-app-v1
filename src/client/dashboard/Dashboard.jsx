@@ -9,8 +9,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  AreaChart,
-  Area,
   PieChart,
   Pie,
   Cell,
@@ -26,26 +24,12 @@ import {
 import CustomPieLabel from '../components/CustomPieLabel';
 
 const Dashboard = () => {
-  const sampleTopIngredients = [
-    { name: 'Flour', value: 2500 },
-    { name: 'Sugar', value: 2000 },
-    { name: 'Salt', value: 1500 },
-    { name: 'Yeast', value: 1000 },
-    { name: 'Butter', value: 800 },
-  ];
-
-  const samplePriceVolatility = [
-    { month: '2024-01', avg_price: 100, deviation: 10 },
-    { month: '2024-02', avg_price: 105, deviation: 15 },
-    { month: '2024-03', avg_price: 95, deviation: 8 },
-  ];
-
   const COLORS = [
     '#FF6B6B', // coral red
     '#4ECDC4', // turquoise
     '#45B7D1', // sky blue
     '#96CEB4', // sage green
-    '#FFEEAD', // soft yellow
+    '#E0BB2C', // soft yellow
   ];
 
   const {
@@ -76,7 +60,6 @@ const Dashboard = () => {
     fetchingDailyStockMovement,
   } = fetchDailyStockMovement();
 
-
   return (
     <div className='flex flex-col gap-4 p-4'>
       <FeatureCard title='Total Value of Inventory Movements'>
@@ -105,7 +88,7 @@ const Dashboard = () => {
                 dataKey='turnover_rate'
                 type='number'
                 padding={{ bottom: 10 }}
-                domain={[-150, 0]}
+                tickFormatter={(value) => value + '%'}
               />
               <Tooltip />
               <Line
@@ -168,7 +151,7 @@ const Dashboard = () => {
         </div>
       </FeatureCard>
 
-      <FeatureCard title='Price Volatility'>
+      {/* <FeatureCard title='Price Volatility'>
         <div className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>
             <AreaChart data={samplePriceVolatility}>
@@ -196,17 +179,21 @@ const Dashboard = () => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </FeatureCard>
+      </FeatureCard> */}
 
       <FeatureCard title='Daily Stock Movement Patterns'>
         <div className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart data={dataDailyStockMovement && dataDailyStockMovement}>
               <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='day_of_week'/>
+              <XAxis dataKey='day_of_week' />
               <YAxis />
               <Tooltip />
-              <Bar dataKey='transaction_count' fill='#8884d8' name='Transaction Count' />
+              <Bar
+                dataKey='transaction_count'
+                fill='#8884d8'
+                name='Transaction Count'
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
