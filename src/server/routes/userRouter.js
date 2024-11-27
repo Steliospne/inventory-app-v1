@@ -1,22 +1,12 @@
 import Router from 'express';
 import bcrypt from 'bcryptjs';
 import passport from 'passport';
-import session from 'express-session';
 import { Strategy } from 'passport-local';
 import pool from '../db/pool.js';
 import { LoginSchema } from '../../client/lib/definitions.js';
+import { createSession } from '../lib/session.js';
 
 export const userRouter = Router();
-
-userRouter.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-  }),
-);
-
-userRouter.use(passport.session());
 
 passport.use(
   new Strategy(async (username, password, done) => {
@@ -71,39 +61,38 @@ passport.use(
   }),
 );
 
+userRouter.get('/', (req, res, next) => {
+  console.log(req.path);
+  next();
+});
+
 userRouter.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info, status) => {
+  passport.authenticate('local', async (err, user, info, status) => {
     if (err) next(err);
 
-    req.session.regenerate((err) => {
-      if (err) next(err);
+    if (!user) return res.send({ messages: info?.messages });
 
-      // store user information in session, typically a user id
-      req.session.user = user;
-      req.user = user;
+    const { session, expiresAt } = await createSession(user);
 
-      // save the session before redirection to ensure page
-      // load does not happen before session is saved
-      req.session.save((err) => {
-        if (err) return next(err);
-      });
+    res.cookie('session', session, {
+      httpOnly: true,
+      secure: true,
+      expires: expiresAt,
+      sameSite: 'lax',
+      path: '/',
+    });
 
-      if (!user)
-        return res.status(401).send({ data: { messages: info?.messages } });
-
-      res.send({
-        data: { user: req.user, messages: info?.messages },
-      });
+    res.send({
+      data: { user: user, messages: info?.messages },
     });
   })(req, res, next);
 });
 
 userRouter.get('/logout', (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    res.send({
-      data: { user: req.user },
-    });
+  res.clearCookie('session', { httpOnly: true, secure: true, sameSite: 'lax' });
+
+  res.send({
+    data: { user: null },
   });
 });
 
