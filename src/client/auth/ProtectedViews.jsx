@@ -1,14 +1,16 @@
 import { useContext } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 import { AuthContext } from '../contexts/AuthContext';
 
-const ProtectedViews = () => {
+const ProtectedViews = ({ children }) => {
   const { user } = useContext(AuthContext);
+
+  console.log('I am the protector');
 
   if (!user) {
     return <Navigate to={'/login'} />;
   }
-  return <Outlet />;
+  return children;
 };
 
 export default ProtectedViews;

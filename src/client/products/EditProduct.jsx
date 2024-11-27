@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchCategories, fetchProduct } from '../lib/data';
-import { Form, Link, redirect, useParams } from 'react-router-dom';
+import { Form, Link, redirect, useParams } from 'react-router';
 import { updateProduct } from '../lib/data';
 import Dropdown from '../components/DropDown';
 
@@ -83,7 +83,7 @@ const EditProduct = () => {
     formData && (
       <div className='flex h-full items-center justify-center'>
         <Form
-          method='post'
+          method='POST'
           className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
         >
           <div className='flex flex-col'>

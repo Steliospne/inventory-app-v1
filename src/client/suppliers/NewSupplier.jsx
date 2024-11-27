@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Link, redirect } from 'react-router-dom';
+import { Form, Link, redirect } from 'react-router';
 import { createNewSupplier } from '../lib/data';
 import Input from '../components/Input';
 
@@ -26,7 +26,7 @@ const EditSupplier = () => {
   return (
     <div className='flex h-full items-center justify-center'>
       <Form
-        method='post'
+        method='POST'
         className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
       >
         <Input

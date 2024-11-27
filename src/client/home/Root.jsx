@@ -1,5 +1,5 @@
 import { ArrowRight, BarChart2, Layers, Search } from 'lucide-react';
-import { useOutlet } from 'react-router-dom';
+import { useOutlet } from 'react-router';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';

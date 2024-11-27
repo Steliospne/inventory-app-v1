@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import BrandLogo from '../components/BrandLogo';
 
 const Sidebar = ({ user }) => {

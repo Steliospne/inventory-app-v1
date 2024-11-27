@@ -1,5 +1,5 @@
-import { useNavigate, useRouteError } from 'react-router-dom';
-import { Bug, CircleX } from 'lucide-react';
+import { useNavigate, useRouteError } from 'react-router';
+import { CircleX } from 'lucide-react';
 import { displayErrors } from '../lib/errorUtil';
 
 const ErrorBoundary = ({ initialError }) => {
