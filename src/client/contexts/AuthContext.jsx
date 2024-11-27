@@ -1,5 +1,6 @@
+import axios from 'axios';
 import { createContext, useState } from 'react';
-import { redirect } from 'react-router-dom';
+import { redirect } from 'react-router';
 
 export const AuthContext = createContext(null);
 
@@ -12,41 +13,29 @@ const AuthProvider = ({ children }) => {
       const formData = await request.formData();
       const userData = Object.fromEntries(formData);
 
-      const res = await fetch(new URL('http://localhost:3000/login'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data } = await axios.post(
+        'http://localhost:3000/login',
+        {
           username: userData.username,
           password: userData.password,
-        }),
-      });
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
-      if (res.status === 404) {
-        throw new Response('', { status: 404 });
-      }
+      console.log(data.messages);
 
-      const { data } = await res.json();
-
-      if (res.ok && data) {
+      if (data) {
         if (!data.user) {
-          return params.message === undefined
-            ? (params.message = null)
-            : (params.message = data.messages);
+          params.message = data.messages;
+          return;
         }
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
         return redirect('/dashboard');
-      }
-
-      if (res.status === 401) {
-        if (data) {
-          redirect('/login');
-          return data.messages === undefined
-            ? (params.message = null)
-            : (params.message = data.messages);
-        }
       }
     } catch (error) {
       console.error(error);
