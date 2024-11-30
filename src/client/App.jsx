@@ -12,6 +12,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import EditProduct, { action as editAction } from './products/EditProduct';
 import NewProduct, {
   action as createProductAction,
+  loader as newProductLoader,
 } from './products/NewProduct';
 import EditSupplier, {
   action as editSupplierAction,
@@ -86,6 +87,7 @@ const App = () => {
             </ProtectedViews>
           ),
           action: createProductAction,
+          loader: newProductLoader,
         },
         {
           path: 'newSupplier',

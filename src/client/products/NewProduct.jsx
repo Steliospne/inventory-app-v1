@@ -1,14 +1,24 @@
 import { useEffect, useState } from 'react';
 import { fetchCategories } from '../lib/data';
-import { Form, Link, redirect } from 'react-router';
+import { Form, Link, redirect, useLoaderData } from 'react-router';
 import { createNewProduct } from '../lib/data';
 import Dropdown from '../components/DropDown';
 import Input from '../components/Input';
+import { strToNum } from '../lib/lib';
+import { formErrors } from '../lib/errorUtil';
 
-export const action = async ({ request }) => {
+export const loader = async ({ params }) => {
+  return params;
+};
+
+export const action = async ({ request, params }) => {
   const formData = await request.formData();
   const product = Object.fromEntries(formData);
+  strToNum(product);
   const res = await createNewProduct(product);
+  if (res.data) {
+    return (params.messages = res.data);
+  }
   if (res.status === 200) return redirect('/products');
 };
 
@@ -17,10 +27,14 @@ const EditProduct = () => {
     fetchCategories();
 
   const [formData, setFormData] = useState({});
+  const { messages } = useLoaderData();
+
+  console.log(messages);
 
   const handleInputChange = (event) => {
     const field = event.target.name;
     const value = event.target.value;
+
     setFormData({
       ...formData,
       [field]: value,
@@ -86,8 +100,7 @@ const EditProduct = () => {
             onChange={handleInputChange}
             value={formData.product}
           />
-
-          {/* {message?.username && formErrors(message.username)} */}
+          {messages?.product && formErrors(messages.product)}
           <div className='flex flex-col'>
             <label htmlFor='category' className='text-lg font-medium'>
               Category:
@@ -101,8 +114,8 @@ const EditProduct = () => {
               onNewOptionChange={handleNewOptionChange}
               onAddNewOption={handleAddNewOption}
             />
+            {messages?.category && formErrors(messages.category)}
           </div>
-          {/* {message?.password && formErrors(message.password)} */}
           <Input
             id='stock'
             type='tel'
@@ -110,12 +123,14 @@ const EditProduct = () => {
             onChange={handleInputChange}
             value={formData.stock}
           />
+          {messages?.stock && formErrors(messages.stock)}
           <Input
             id='price'
             LabelText='Price:'
             onChange={handleInputChange}
             value={formData.price}
           />
+          {messages?.price && formErrors(messages.price)}
           <div className='flex gap-6'>
             <button
               type='submit'
