@@ -15,6 +15,8 @@ import {
   deleteCategory,
   updateCategory,
 } from '../db/queries.js';
+import { ProductSchema } from '../lib/definitions.js';
+import { getErrorMessages } from '../lib/lib.js';
 
 export const apiRouter = Router();
 
@@ -32,6 +34,18 @@ apiRouter.get('/api/products/:productId', async (req, res) => {
 apiRouter.post('/api/newProduct', async (req, res) => {
   const { product } = req.body;
   const categories = await getCategories();
+  const validatedFields = ProductSchema.safeParse({
+    product: product.product,
+    category: product.category,
+    stock: product.stock,
+    price: product.price,
+  });
+
+  if (!validatedFields.success) {
+    const errors = validatedFields?.error?.errors;
+    console.log(product);
+    return res.send(getErrorMessages(errors));
+  }
   const found = categories.find(
     (category) => category.name.toLowerCase() == product.category.toLowerCase(),
   );
@@ -42,7 +56,6 @@ apiRouter.post('/api/newProduct', async (req, res) => {
     await createNewCategory(product.category);
     await createNewProduct(product);
   }
-  console.log(product, categories);
   res.send();
 });
 
