@@ -13,15 +13,15 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import FeatureCard from '../components/FeatureCard';
+import FeatureCard from '../components/FeatureCard.jsx';
 import {
   fetchDailyStockMovement,
   fetchInventoryMovements,
   fetchTopMovingIngredients,
   fetchTurnOverRate,
-} from '../lib/data.js';
+} from '../lib/data';
 
-import CustomPieLabel from '../components/CustomPieLabel';
+import CustomPieLabel from '../components/CustomPieLabel.jsx';
 
 const Dashboard = () => {
   const COLORS = [
