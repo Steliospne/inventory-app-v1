@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import { Strategy } from 'passport-local';
 import pool from '../db/pool.js';
-import { LoginSchema } from '../../client/lib/definitions.js';
+import { LoginSchema } from '../lib/definitions.js';
 import { createSession } from '../lib/session.js';
 
 export const userRouter = Router();
@@ -61,11 +61,6 @@ passport.use(
   }),
 );
 
-userRouter.get('/', (req, res, next) => {
-  console.log(req.path);
-  next();
-});
-
 userRouter.post('/login', (req, res, next) => {
   passport.authenticate('local', async (err, user, info, status) => {
     if (err) next(err);
@@ -83,7 +78,8 @@ userRouter.post('/login', (req, res, next) => {
     });
 
     res.send({
-      data: { user: user, messages: info?.messages },
+      user,
+      messages: info?.messages,
     });
   })(req, res, next);
 });

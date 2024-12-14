@@ -35,7 +35,7 @@ apiRouter.post('/api/newProduct', async (req, res) => {
   const { product } = req.body;
   const categories = await getCategories();
   const validatedFields = ProductSchema.safeParse({
-    product: product.product,
+    name: product.name,
     category: product.category,
     stock: product.stock,
     price: product.price,
@@ -43,7 +43,6 @@ apiRouter.post('/api/newProduct', async (req, res) => {
 
   if (!validatedFields.success) {
     const errors = validatedFields?.error?.errors;
-    console.log(product);
     return res.send(getErrorMessages(errors));
   }
   const found = categories.find(
@@ -114,6 +113,7 @@ apiRouter.get('/api/suppliers', async (req, res) => {
   const suppliers = await getSuppliers();
   res.send(suppliers);
 });
+
 apiRouter.get('/api/suppliers/:supplierId', async (req, res) => {
   const supplierId = req.params.supplierId;
   const [suppliers] = await getSupplier(supplierId);
