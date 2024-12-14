@@ -9,7 +9,7 @@ import {
   fetchCategories,
   deleteCategory,
   updateCategory,
-} from '../lib/data';
+} from '../lib/data.ts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CirclePlus, Trash2, Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -19,8 +19,12 @@ import EditCategory from '../categories/EditCategory';
 const columnHelper = createColumnHelper();
 
 const Categories = () => {
-  const { pendingCategories, categoryError, categoryData, fetchingCategories } =
-    fetchCategories();
+  const {
+    pendingCategories,
+    categoriesError,
+    categoriesData,
+    fetchingCategories,
+  } = fetchCategories();
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -48,15 +52,15 @@ const Categories = () => {
   });
 
   const [edit, setEdit] = useState(null);
-  const [formData, setFormData] = useState(categoryData);
+  const [formData, setFormData] = useState(categoriesData);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
-  const [updatedCategory, setUpdatedCategory] = useState({ id: '', value: '' });
+  const [updatedCategory, setUpdatedCategory] = useState({ id: '', name: '' });
   const [newCategory, setNewCategory] = useState('');
 
   useEffect(() => {
-    setFormData(categoryData);
-  }, [categoryData]);
+    setFormData(categoriesData);
+  }, [categoriesData]);
 
   const columns = [
     columnHelper.accessor('name', {
@@ -165,7 +169,7 @@ const Categories = () => {
     },
   });
 
-  if (categoryError) throw categoryError;
+  if (categoriesError) throw categoriesError;
 
   if (fetchingCategories) return <p>Loading...</p>;
 
