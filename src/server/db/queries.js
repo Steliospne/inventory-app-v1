@@ -1,4 +1,3 @@
-import { query } from 'express';
 import pool from './pool.js';
 
 export const createNewProduct = async (product) => {
@@ -8,12 +7,7 @@ export const createNewProduct = async (product) => {
     VALUES ($1, (SELECT id FROM product_categories WHERE name = $2), $3, $4);
   `;
 
-  const values = [
-    product.product,
-    product.category,
-    product.stock,
-    product.price,
-  ];
+  const values = [product.name, product.category, product.stock, product.price];
 
   await pool.query(query, values);
 };
@@ -22,7 +16,7 @@ export const getProducts = async () => {
   const query = `
     SELECT
       p.id AS id, 
-      p.name AS product,
+      p.name AS name,
       p.selling_price AS price,
       p.current_stock AS stock, 
       pc.name AS category
@@ -43,7 +37,7 @@ export const getProduct = async (id) => {
   const query = `
     SELECT
       p.id AS id, 
-      p.name AS product,
+      p.name AS name,
       p.selling_price AS price,
       p.current_stock AS stock, 
       pc.name AS category
@@ -88,7 +82,7 @@ export const updateProduct = async (id, product) => {
   `;
 
   const values = [
-    product.product,
+    product.name,
     product.category,
     product.stock,
     product.price,
