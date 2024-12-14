@@ -1,4 +1,5 @@
 import z from 'zod';
+import validator from 'validator';
 
 export const LoginSchema = z.object({
   username: z
@@ -12,14 +13,18 @@ export const LoginSchema = z.object({
 });
 
 export const ProductSchema = z.object({
-  product: z
+  name: z
     .string()
+    .min(1, { message: 'Product name cannot be empty' })
     .trim()
-    .min(1, { message: 'Product name cannot be empty' }),
+    .refine((val) => validator.isAlpha(val), {
+      message: 'Product name must contain only letters',
+    }),
   category: z
     .string()
     .min(1, { message: 'Product category cannot be empty' })
     .trim(),
+
   stock: z
     .number()
     .gte(1, { message: 'You need to provide a stock value' })
