@@ -31,3 +31,9 @@ export type Supplier = {
   address: string,
   contactPerson: string,
 }
+
+export type Suppliers = Supplier[];
+
+export type ValidationErrors = {
+  [fieldName: string]: string[];
+};
