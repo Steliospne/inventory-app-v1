@@ -9,16 +9,17 @@ import {
 } from 'react-router';
 import { createNewProduct } from '../lib/data';
 import Dropdown from '../components/DropDown';
-import Input from '../components/Input.jsx';
+import Input from '../components/Input';
 import { productFromFormData } from '../lib/lib';
-import { formErrors } from '../lib/errorUtil.jsx';
-import { Category, Product } from '../../types/models';
+import { formErrors } from '../lib/errorUtil';
+import { Category, Product, ValidationErrors } from '../../types/models';
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const product = productFromFormData(Object.fromEntries(formData));
 
   const res = await createNewProduct(product);
+
   if (res.data) {
     return data({ messages: res.data }, { status: 400 });
   }
@@ -45,7 +46,7 @@ const EditProduct = () => {
   const [newOption, setNewOption] = useState({ name: '' });
   const [isAddingNew, setIsAddingNew] = useState(false);
 
-  const messages = fetcher.data?.messages;
+  const messages = fetcher.data?.messages as ValidationErrors;
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const field = event.target.name;

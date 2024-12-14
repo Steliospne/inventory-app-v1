@@ -13,21 +13,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 const columnHelper = createColumnHelper();
 
 const Products = () => {
-  const { pendingProducts, productError, productData, fetchingProducts } =
+  const { pendingProducts, productsError, productsData, fetchingProducts } =
     fetchProducts();
 
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (productId) => deleteProduct(productId),
+    mutationFn: (productId: string) => deleteProduct(productId),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 
-  const columns = [
-    columnHelper.accessor('product', {
+  const columns: any = [
+    columnHelper.accessor('name', {
       header: () => <span>Product</span>,
     }),
     columnHelper.accessor('category', {
@@ -79,12 +79,12 @@ const Products = () => {
   ];
 
   const table = useReactTable({
-    data: productData,
+    data: productsData ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (productError) throw productError;
+  if (productsError) throw productsError;
 
   if (fetchingProducts) return <p>Loading...</p>;
 
@@ -125,7 +125,7 @@ const Products = () => {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(() => setOpen(!open)),
+                        cell.getContext(),
                       )}
                     </td>
                   ))}
