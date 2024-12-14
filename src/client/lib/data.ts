@@ -1,24 +1,20 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import axios from 'axios';
 import { dateYearMonthFormatter, mapDayOfWeek } from './lib';
-import type { Product, Category, Categories } from '../../types/models.ts';
-
-export const createNewProduct = async (product: Product) => {
-  try {
-    const response = await axios.post(`http://localhost:3000/api/newProduct`, {
-      product: product,
-    });
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+import type { Product, Category, Categories, ValidationErrors, Products, Supplier, Suppliers } from '../../types/models.ts';
 
 interface ProductFetchResult {
   pendingProduct: boolean;
   productError: Error | null;
   productData: Product | undefined;
   fetchingProduct: boolean;
+ }
+
+ interface ProductsFetchResult {
+  pendingProducts: boolean;
+  productsError: Error | null;
+  productsData: Products | undefined;
+  fetchingProducts: boolean;
  }
 
  interface CategoriesFetchResult {
@@ -28,19 +24,37 @@ interface ProductFetchResult {
   fetchingCategories: boolean;
  }
 
-export const fetchProducts = () => {
-  const { isPending, error, data, isFetching } = useQuery({
+ interface SuppliersFetchResult {
+  pendingSuppliers: boolean;
+  suppliersError: Error | null;
+  suppliersData: Suppliers | undefined;
+  fetchingSuppliers: boolean;
+ }
+
+export const createNewProduct = async (product: Product) => {
+  try {
+    const response = await axios.post<ValidationErrors>(`http://localhost:3000/api/newProduct`, {
+      product: product,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchProducts = (): ProductsFetchResult => {
+  const { isPending, error, data, isFetching }: UseQueryResult<Products> = useQuery({
     queryKey: ['products'],
-    queryFn: async () => {
-      const response = await axios.get('http://localhost:3000/api/products');
+    queryFn: async (): Promise<Products> => {
+      const response = await axios.get<Products>('http://localhost:3000/api/products');
       return response.data;
     },
   });
 
   return {
     pendingProducts: isPending,
-    productError: error,
-    productData: data,
+    productsError: error,
+    productsData: data,
     fetchingProducts: isFetching,
   };
 };
@@ -67,7 +81,7 @@ export const fetchProduct = (id: string | undefined): ProductFetchResult => {
 
 export const updateProduct = async (id: string | undefined , product: Product) => {
   try {
-    const response = await axios.put(
+    const response = await axios.put<ValidationErrors>(
       `http://localhost:3000/api/products/${id}`,
       {
         product,
@@ -79,7 +93,7 @@ export const updateProduct = async (id: string | undefined , product: Product) =
   }
 };
 
-export const deleteProduct = async (id) => {
+export const deleteProduct = async (id: string | undefined) => {
   try {
     const response = await axios.delete(
       `http://localhost:3000/api/delete/products/${id}`,
@@ -90,7 +104,7 @@ export const deleteProduct = async (id) => {
   }
 };
 
-export const createNewCategory = async (category) => {
+export const createNewCategory = async (category: Category) => {
   try {
     const response = await axios.post(`http://localhost:3000/api/newCategory`, {
       category,
@@ -102,7 +116,7 @@ export const createNewCategory = async (category) => {
 };
 
 export const fetchCategories = (): CategoriesFetchResult => {
-  const { isPending, error, data, isFetching }: UseQueryResult<Category, Error> = useQuery({
+  const { isPending, error, data, isFetching }: UseQueryResult<Categories, Error> = useQuery({
     queryKey: ['categories'],
     queryFn: async (): Promise<Categories> => {
       const response = await axios.get<Categories>('http://localhost:3000/api/categories');
@@ -118,7 +132,7 @@ export const fetchCategories = (): CategoriesFetchResult => {
   };
 };
 
-export const deleteCategory = async (id) => {
+export const deleteCategory = async (id: string | undefined) => {
   try {
     const response = await axios.delete(
       `http://localhost:3000/api/delete/categories/${id}`,
@@ -129,10 +143,10 @@ export const deleteCategory = async (id) => {
   }
 };
 
-export const updateCategory = async (category) => {
+export const updateCategory = async (category: Category) => {
   try {
     const id = category.id;
-    const newCategory = category.value;
+    const newCategory = category.name;
 
     const response = await axios.put(
       `http://localhost:3000/api/categories/${id}`,
@@ -146,24 +160,24 @@ export const updateCategory = async (category) => {
   }
 };
 
-export const fetchSuppliers = () => {
-  const { isPending, error, data, isFetching } = useQuery({
+export const fetchSuppliers = (): SuppliersFetchResult => {
+  const { isPending, error, data, isFetching }: UseQueryResult<Suppliers> = useQuery({
     queryKey: ['suppliers'],
-    queryFn: async () => {
-      const response = await axios.get('http://localhost:3000/api/suppliers');
+    queryFn: async (): Promise<Suppliers> => {
+      const response = await axios.get<Suppliers>('http://localhost:3000/api/suppliers');
       return response.data;
     },
   });
 
   return {
     pendingSuppliers: isPending,
-    supplierError: error,
-    supplierData: data,
+    suppliersError: error,
+    suppliersData: data,
     fetchingSuppliers: isFetching,
   };
 };
 
-export const fetchSupplier = (id) => {
+export const fetchSupplier = (id: string | undefined) => {
   const { isPending, error, data, isFetching } = useQuery({
     queryKey: ['supplier', id],
     queryFn: async () => {
@@ -182,7 +196,7 @@ export const fetchSupplier = (id) => {
   };
 };
 
-export const updateSupplier = async (id, supplier) => {
+export const updateSupplier = async (id: string | undefined, supplier: Supplier) => {
   try {
     const response = await axios.put(
       `http://localhost:3000/api/suppliers/${id}`,
@@ -196,7 +210,7 @@ export const updateSupplier = async (id, supplier) => {
   }
 };
 
-export const createNewSupplier = async (supplier) => {
+export const createNewSupplier = async (supplier: Supplier) => {
   try {
     const response = await axios.post(`http://localhost:3000/api/newSupplier`, {
       supplier,
@@ -207,7 +221,7 @@ export const createNewSupplier = async (supplier) => {
   }
 };
 
-export const deleteSupplier = async (id) => {
+export const deleteSupplier = async (id: string | undefined) => {
   try {
     const response = await axios.delete(
       `http://localhost:3000/api/delete/suppliers/${id}`,

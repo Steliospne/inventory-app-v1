@@ -1,12 +1,12 @@
 import { Product } from "../../types/models";
 
-export const dateYearMonthFormatter = (obj) => {
+export const dateYearMonthFormatter = (obj: {[key: string]:string}): string => {
   const date = obj.month.split('T')[0];
   const month = date.slice(0, -3);
   return month;
 };
 
-export const mapDayOfWeek = (obj): string => {
+export const mapDayOfWeek = (obj: {[key: string]:number}): string => {
   const week = ['Sun', 'Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat'];
   return week[obj.day_of_week];
 };

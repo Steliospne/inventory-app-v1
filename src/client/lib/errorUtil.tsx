@@ -1,4 +1,9 @@
-export const formErrors = (error) => {
+import { ReactNode } from 'react';
+import { ValidationErrors } from '../../types/models';
+
+export const formErrors = (
+  error: ValidationErrors[keyof ValidationErrors],
+): ReactNode => {
   if (Array.isArray(error))
     return error.map((error, index) => (
       <p key={index}>
@@ -12,7 +17,7 @@ export const formErrors = (error) => {
   );
 };
 
-export const displayErrors = (message, status) => {
+export const displayErrors = (message: string, status: string): ReactNode => {
   return (
     <p>
       <i className='text-3xl font-bold'>
