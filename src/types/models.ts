@@ -1,36 +1,25 @@
-export type Category = {
-  id?: string,
-  name: string,
-  createdAt?: Date,
-  updatedAt?: Date,
-}
+import { z } from 'zod';
+import {
+  CategorySchema,
+  ProductSchema,
+  SupplierSchema,
+} from '../lib/definitions';
+
+export type User = {
+  userId?: string;
+  username?: string;
+  password?: string;
+};
+
+export type Category = z.infer<typeof CategorySchema>;
 
 export type Categories = Category[];
 
-export type Product = {
-  id?: string | number,
-  name: string,
-  category: string,
-  price: number,
-  stock: number,
-  isAvailable?: boolean,
-  createdAt?: Date,
-  updatedAt?: Date,
-}
+export type Product = z.infer<typeof ProductSchema>;
 
 export type Products = Product[];
 
-
-export type Supplier = {
-  id: string | number,
-  name: string,
-  email: string,
-  phone: string,
-  createdAt: Date,
-  updatedAt: Date,
-  address: string,
-  contactPerson: string,
-}
+export type Supplier = z.infer<typeof SupplierSchema>;
 
 export type Suppliers = Supplier[];
 
