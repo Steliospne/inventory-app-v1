@@ -19,7 +19,7 @@ import {
   fetchInventoryMovements,
   fetchTopMovingIngredients,
   fetchTurnOverRate,
-} from '../lib/data';
+} from '../../lib/data';
 
 import CustomPieLabel from '../components/CustomPieLabel.jsx';
 
@@ -61,7 +61,7 @@ const Dashboard = () => {
   } = fetchDailyStockMovement();
 
   return (
-    <div className='flex flex-col gap-4 p-4'>
+    <div className='flex w-full max-w-screen-lg flex-col gap-4 place-self-center p-4'>
       <FeatureCard title='Total Value of Inventory Movements'>
         <div className='h-64'>
           <ResponsiveContainer width='100%' height='100%'>

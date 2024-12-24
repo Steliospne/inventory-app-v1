@@ -12,7 +12,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import EditProduct, { action as editAction } from './products/EditProduct';
 import NewProduct, {
   action as createProductAction,
-  loader as newProductLoader,
 } from './products/NewProduct';
 import EditSupplier, {
   action as editSupplierAction,
@@ -20,7 +19,7 @@ import EditSupplier, {
 import NewSupplier, {
   action as createSupplierAction,
 } from './suppliers/NewSupplier';
-import Categories from './components/Categories';
+import Categories from './categories/Categories';
 
 const App = () => {
   const { loginAction } = useContext(AuthContext);
@@ -87,7 +86,6 @@ const App = () => {
             </ProtectedViews>
           ),
           action: createProductAction,
-          loader: newProductLoader,
         },
         {
           path: 'newSupplier',

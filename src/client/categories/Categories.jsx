@@ -9,7 +9,7 @@ import {
   fetchCategories,
   deleteCategory,
   updateCategory,
-} from '../lib/data.ts';
+} from '../../lib/data.ts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CirclePlus, Trash2, Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -65,33 +65,6 @@ const Categories = () => {
   const columns = [
     columnHelper.accessor('name', {
       header: () => <span>Category</span>,
-      cell: ({ getValue, row: { index }, column: { id }, table }) => {
-        const initialValue = getValue();
-        const [value, setValue] = useState(initialValue);
-
-        const onBlur = () => {
-          table.options.meta?.updateData(index, id, value);
-          setEdit(null);
-        };
-
-        return (
-          <div>
-            {edit == index ? (
-              <input
-                key={index}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                type='text'
-                onBlur={onBlur}
-                name='category'
-                id='category'
-              />
-            ) : (
-              <div>{value}</div>
-            )}
-          </div>
-        );
-      },
     }),
     columnHelper.accessor('id', {
       header: () => <span>Action</span>,
@@ -151,22 +124,6 @@ const Categories = () => {
     data: formData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    meta: {
-      updateData: (rowIndex, columnId, value) => {
-        // Skip page index reset until after next rerender
-        setFormData((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex],
-                [columnId]: value,
-              };
-            }
-            return row;
-          }),
-        );
-      },
-    },
   });
 
   if (categoriesError) throw categoriesError;
