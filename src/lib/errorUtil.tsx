@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ValidationErrors } from '../../types/models';
+import { ValidationErrors } from '../types/models';
 
 export const formErrors = (
   error: ValidationErrors[keyof ValidationErrors],

@@ -1,55 +1,41 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import axios from 'axios';
 import { dateYearMonthFormatter, mapDayOfWeek } from './lib';
-import type { Product, Category, Categories, ValidationErrors, Products, Supplier, Suppliers } from '../../types/models.ts';
-
-interface ProductFetchResult {
-  pendingProduct: boolean;
-  productError: Error | null;
-  productData: Product | undefined;
-  fetchingProduct: boolean;
- }
-
- interface ProductsFetchResult {
-  pendingProducts: boolean;
-  productsError: Error | null;
-  productsData: Products | undefined;
-  fetchingProducts: boolean;
- }
-
- interface CategoriesFetchResult {
-  pendingCategories: boolean;
-  categoriesError: Error | null;
-  categoriesData: Categories | undefined;
-  fetchingCategories: boolean;
- }
-
- interface SuppliersFetchResult {
-  pendingSuppliers: boolean;
-  suppliersError: Error | null;
-  suppliersData: Suppliers | undefined;
-  fetchingSuppliers: boolean;
- }
+import type {
+  Product,
+  Category,
+  Categories,
+  ValidationErrors,
+  Products,
+  Supplier,
+  Suppliers,
+} from '../types/models';
 
 export const createNewProduct = async (product: Product) => {
   try {
-    const response = await axios.post<ValidationErrors>(`http://localhost:3000/api/newProduct`, {
-      product: product,
-    });
+    const response = await axios.post<ValidationErrors>(
+      `http://localhost:3000/api/newProduct`,
+      {
+        product: product,
+      },
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const fetchProducts = (): ProductsFetchResult => {
-  const { isPending, error, data, isFetching }: UseQueryResult<Products> = useQuery({
-    queryKey: ['products'],
-    queryFn: async (): Promise<Products> => {
-      const response = await axios.get<Products>('http://localhost:3000/api/products');
-      return response.data;
-    },
-  });
+export const fetchProducts = () => {
+  const { isPending, error, data, isFetching }: UseQueryResult<Products> =
+    useQuery({
+      queryKey: ['products'],
+      queryFn: async (): Promise<Products> => {
+        const response = await axios.get<Products>(
+          'http://localhost:3000/api/products',
+        );
+        return response.data;
+      },
+    });
 
   return {
     pendingProducts: isPending,
@@ -59,17 +45,18 @@ export const fetchProducts = (): ProductsFetchResult => {
   };
 };
 
-export const fetchProduct = (id: string | undefined): ProductFetchResult => {
-  const { isPending, error, data, isFetching }: UseQueryResult<Product, Error> = useQuery({
-    queryKey: ['product', id],
-    queryFn: async (): Promise<Product> => {
-      const response = await axios.get<Product>(
-        `http://localhost:3000/api/products/${id}`,
-      );
-      
-      return response.data;
-    },
-  });
+export const fetchProduct = (id: string | undefined) => {
+  const { isPending, error, data, isFetching }: UseQueryResult<Product, Error> =
+    useQuery({
+      queryKey: ['product', id],
+      queryFn: async (): Promise<Product> => {
+        const response = await axios.get<Product>(
+          `http://localhost:3000/api/products/${id}`,
+        );
+
+        return response.data;
+      },
+    });
 
   return {
     pendingProduct: isPending,
@@ -79,7 +66,10 @@ export const fetchProduct = (id: string | undefined): ProductFetchResult => {
   };
 };
 
-export const updateProduct = async (id: string | undefined , product: Product) => {
+export const updateProduct = async (
+  id: string | undefined,
+  product: Product,
+) => {
   try {
     const response = await axios.put<ValidationErrors>(
       `http://localhost:3000/api/products/${id}`,
@@ -115,11 +105,18 @@ export const createNewCategory = async (category: Category) => {
   }
 };
 
-export const fetchCategories = (): CategoriesFetchResult => {
-  const { isPending, error, data, isFetching }: UseQueryResult<Categories, Error> = useQuery({
+export const fetchCategories = () => {
+  const {
+    isPending,
+    error,
+    data,
+    isFetching,
+  }: UseQueryResult<Categories, Error> = useQuery({
     queryKey: ['categories'],
     queryFn: async (): Promise<Categories> => {
-      const response = await axios.get<Categories>('http://localhost:3000/api/categories');
+      const response = await axios.get<Categories>(
+        'http://localhost:3000/api/categories',
+      );
       return response.data;
     },
   });
@@ -160,14 +157,17 @@ export const updateCategory = async (category: Category) => {
   }
 };
 
-export const fetchSuppliers = (): SuppliersFetchResult => {
-  const { isPending, error, data, isFetching }: UseQueryResult<Suppliers> = useQuery({
-    queryKey: ['suppliers'],
-    queryFn: async (): Promise<Suppliers> => {
-      const response = await axios.get<Suppliers>('http://localhost:3000/api/suppliers');
-      return response.data;
-    },
-  });
+export const fetchSuppliers = () => {
+  const { isPending, error, data, isFetching }: UseQueryResult<Suppliers> =
+    useQuery({
+      queryKey: ['suppliers'],
+      queryFn: async (): Promise<Suppliers> => {
+        const response = await axios.get<Suppliers>(
+          'http://localhost:3000/api/suppliers',
+        );
+        return response.data;
+      },
+    });
 
   return {
     pendingSuppliers: isPending,
@@ -180,8 +180,8 @@ export const fetchSuppliers = (): SuppliersFetchResult => {
 export const fetchSupplier = (id: string | undefined) => {
   const { isPending, error, data, isFetching } = useQuery({
     queryKey: ['supplier', id],
-    queryFn: async () => {
-      const response = await axios.get(
+    queryFn: async (): Promise<Supplier> => {
+      const response = await axios.get<Supplier>(
         `http://localhost:3000/api/suppliers/${id}`,
       );
       return response.data;
@@ -196,7 +196,10 @@ export const fetchSupplier = (id: string | undefined) => {
   };
 };
 
-export const updateSupplier = async (id: string | undefined, supplier: Supplier) => {
+export const updateSupplier = async (
+  id: string | undefined,
+  supplier: Supplier,
+) => {
   try {
     const response = await axios.put(
       `http://localhost:3000/api/suppliers/${id}`,
