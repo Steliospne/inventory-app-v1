@@ -3,8 +3,8 @@ import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import { Strategy } from 'passport-local';
 import pool from '../db/pool.js';
-import { LoginSchema } from '../lib/definitions.js';
-import { createSession } from '../lib/session.js';
+import { LoginSchema } from '../../lib/definitions.js';
+import { createSession } from '../../lib/session.js';
 
 export const userRouter = Router();
 

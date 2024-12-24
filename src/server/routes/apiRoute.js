@@ -15,8 +15,8 @@ import {
   deleteCategory,
   updateCategory,
 } from '../db/queries.js';
-import { ProductSchema } from '../lib/definitions.js';
-import { getErrorMessages } from '../lib/lib.js';
+import { CategorySchema, ProductSchema } from '../../lib/definitions.js';
+import { getErrorMessages } from '../../lib/lib-server.js';
 
 export const apiRouter = Router();
 
@@ -78,8 +78,16 @@ apiRouter.put('/api/products/:productId', async (req, res) => {
 
 apiRouter.post('/api/newCategory', async (req, res) => {
   const { category } = req.body;
+  const validatedFields = CategorySchema.safeParse({
+    name: category,
+  });
+
+  if (!validatedFields.success) {
+    const errors = validatedFields?.error?.errors;
+    return res.send(getErrorMessages(errors));
+  }
+
   await createNewCategory(category);
-  console.log(category);
   res.send();
 });
 
