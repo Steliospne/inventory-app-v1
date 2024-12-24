@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Input from '../components/Input';
-import { formErrors } from '../lib/errorUtil';
+import { formErrors } from '../../lib/errorUtil';
 import { Form, useLoaderData } from 'react-router';
 
 export const loader = async ({ params }) => {
