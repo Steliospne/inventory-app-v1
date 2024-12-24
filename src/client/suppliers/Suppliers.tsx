@@ -1,5 +1,5 @@
 import { CirclePlus, Trash2, Pencil } from 'lucide-react';
-import { fetchSuppliers, deleteSupplier } from '../lib/data.js';
+import { fetchSuppliers, deleteSupplier } from '../../lib/data.js';
 import {
   createColumnHelper,
   flexRender,
@@ -8,23 +8,24 @@ import {
 } from '@tanstack/react-table';
 import { Link } from 'react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import LoadingSpinner from '../components/LoadingSpinner.jsx';
 
 const columnHelper = createColumnHelper();
 
 const Suppliers = () => {
-  const { pendingSuppliers, supplierError, supplierData, fetchingSuppliers } =
+  const { pendingSuppliers, suppliersError, suppliersData, fetchingSuppliers } =
     fetchSuppliers();
 
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (supplierId) => deleteSupplier(supplierId),
+    mutationFn: (supplierId: string) => deleteSupplier(supplierId),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
     },
   });
-  const columns = [
+  const columns: any[] = [
     columnHelper.accessor('supplier', {
       header: () => <span>Supplier</span>,
     }),
@@ -74,14 +75,14 @@ const Suppliers = () => {
   ];
 
   const table = useReactTable({
-    data: supplierData,
+    data: suppliersData ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (supplierError) throw supplierError;
+  if (suppliersError) throw suppliersError;
 
-  if (fetchingSuppliers) return <p>Loading...</p>;
+  if (fetchingSuppliers) return <LoadingSpinner />;
 
   if (!pendingSuppliers) {
     return (
@@ -117,10 +118,7 @@ const Suppliers = () => {
                     className={`border-2 border-zinc-300 px-2 py-1`}
                     key={cell.id}
                   >
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext(() => setOpen(!open)),
-                    )}
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
               </tr>
