@@ -1,58 +1,66 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActionFunctionArgs,
-  Form,
+  data,
   Link,
   redirect,
+  useFetcher,
   useParams,
 } from 'react-router';
-import { updateProduct, fetchCategories, fetchProduct } from '../lib/data';
+import { updateProduct, fetchCategories, fetchProduct } from '../../lib/data';
 import Dropdown from '../components/DropDown.jsx';
-import type { Category, Product } from '../../types/models';
+import type { Category, ValidationErrors } from '../../types/models';
+import { fromFormData } from '../../lib/lib';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { ProductSchema } from '../../lib/definitions';
+import Input from '../components/Input';
+import { formErrors } from '../../lib/errorUtil';
+import { getErrorMessages } from '../../lib/lib-server';
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const formDataObj = Object.fromEntries(formData);
+  const result = fromFormData(Object.fromEntries(formData), ProductSchema);
 
-  const product: Product = {
-    id: Number(formDataObj.id),
-    name: formDataObj.name as string,
-    category: formDataObj.category as string,
-    price: Number(formDataObj.price),
-    stock: Number(formDataObj.stock),
-    isAvailable: Boolean(formDataObj.isAvailable),
-    createdAt: new Date(formDataObj.createdAt as string),
-    updatedAt: new Date(formDataObj.updatedAt as string),
-  };
+  // Client side validation
+  if (!result.success) {
+    const messages = getErrorMessages(result.error.errors);
+    return data({ messages }, { status: 400 });
+  }
 
   const { productId } = params;
+  const product = result.data;
   const res = await updateProduct(productId, product);
+
+  // Server side response
+  if (res.data) {
+    return data({ messages: res.data }, { status: 400 });
+  }
+
   if (res.status === 200) return redirect('/products');
 };
 
 const EditProduct = () => {
   const { productId } = useParams();
-  const { pendingProduct, productError, productData, fetchingProduct } =
+  const { productError, productData, fetchingProduct } =
     fetchProduct(productId);
-  const {
-    pendingCategories,
-    categoriesError,
-    categoriesData,
-    fetchingCategories,
-  } = fetchCategories();
+  const { categoriesError, categoriesData, fetchingCategories } =
+    fetchCategories();
 
   const [product, setProduct] = useState(productData);
-
   const [options, setOptions] = useState(categoriesData);
   const [selectedOption, setSelectedOption] = useState('');
-  const [newOption, setNewOption] = useState<Pick<Category, 'name'>>({
+  const [newOption, setNewOption] = useState<Category>({
     name: '',
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
 
+  const fetcher = useFetcher();
+  const messages = fetcher.data?.messages as ValidationErrors;
+
   useEffect(() => {
     setOptions(categoriesData);
     setProduct(productData);
+    if (productData) setSelectedOption(() => productData?.category);
   }, [productData, categoriesData]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -116,74 +124,61 @@ const EditProduct = () => {
     });
   };
 
+  if (productError) throw productError;
+  else if (categoriesError) throw categoriesError;
+
+  if (fetchingProduct) return <LoadingSpinner />;
+
   return (
     product && (
       <div className='flex h-full items-center justify-center'>
-        <Form
+        <fetcher.Form
           method='POST'
           className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
         >
           <div className='flex flex-col'>
-            <label htmlFor='product' className='text-lg font-medium'>
-              Product name:
-            </label>
-            <input
-              type='text'
-              name='product'
-              id='product'
-              autoComplete='product'
-              value={product.name}
+            <Input
+              id='name'
+              LabelText='Product name:'
               onChange={handleInputChange}
-              required
-              className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
+              value={product.name}
             />
           </div>
-          {/* {message?.username && formErrors(message.username)} */}
-          <div className='mt-4 flex flex-col'>
+          {messages?.name && formErrors(messages.name)}
+          <div className='flex flex-col'>
             <label htmlFor='category' className='text-lg font-medium'>
               Category:
             </label>
-            <Dropdown
-              options={options}
-              selectedOption={selectedOption}
-              newOption={newOption}
-              isAddingNew={isAddingNew}
-              onSelectChange={handleSelectChange}
-              onNewOptionChange={handleNewOptionChange}
-              onAddNewOption={handleAddNewOption}
-            />
+            {fetchingCategories ? (
+              <LoadingSpinner page={false} />
+            ) : (
+              <Dropdown
+                options={options}
+                selectedOption={selectedOption}
+                newOption={newOption}
+                isAddingNew={isAddingNew}
+                onSelectChange={handleSelectChange}
+                onNewOptionChange={handleNewOptionChange}
+                onAddNewOption={handleAddNewOption}
+              />
+            )}
+            {messages?.category && formErrors(messages.category)}
           </div>
-          {/* {message?.password && formErrors(message.password)} */}
-          <div className='flex flex-col'>
-            <label htmlFor='stock' className='text-lg font-medium'>
-              Stock:
-            </label>
-            <input
-              type='tel'
-              name='stock'
-              id='stock'
-              autoComplete='stock'
-              required
-              value={product.stock}
-              onChange={handleInputChange}
-              className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
-            />
-          </div>
-          <div className='flex flex-col'>
-            <label htmlFor='price' className='text-lg font-medium'>
-              Price:
-            </label>
-            <input
-              type='text'
-              name='price'
-              id='price'
-              autoComplete='price'
-              required
-              value={product.price}
-              onChange={handleInputChange}
-              className='mt-4 h-10 rounded-lg px-4 py-5 focus:outline-offset-1'
-            />
-          </div>
+          <Input
+            id='stock'
+            type='tel'
+            LabelText='Stock:'
+            onChange={handleInputChange}
+            value={product.stock}
+          />
+          {messages?.stock && formErrors(messages.stock)}
+          <Input
+            id='price'
+            LabelText='Price:'
+            onChange={handleInputChange}
+            value={product.price}
+          />
+          {messages?.price && formErrors(messages.price)}
           <div className='flex gap-6'>
             <button
               type='submit'
@@ -199,7 +194,7 @@ const EditProduct = () => {
               Cancel
             </Link>
           </div>
-        </Form>
+        </fetcher.Form>
       </div>
     )
   );

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { fetchCategories } from '../lib/data';
+import { useEffect, useState } from 'react';
+import { fetchCategories } from '../../lib/data';
 import {
   ActionFunctionArgs,
   data,
@@ -7,32 +7,41 @@ import {
   redirect,
   useFetcher,
 } from 'react-router';
-import { createNewProduct } from '../lib/data';
+import { createNewProduct } from '../../lib/data';
 import Dropdown from '../components/DropDown';
 import Input from '../components/Input';
-import { productFromFormData } from '../lib/lib';
-import { formErrors } from '../lib/errorUtil';
+import { fromFormData } from '../../lib/lib';
+import { formErrors } from '../../lib/errorUtil';
 import { Category, Product, ValidationErrors } from '../../types/models';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { ProductSchema } from '../../lib/definitions';
+import { getErrorMessages } from '../../lib/lib-server';
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const product = productFromFormData(Object.fromEntries(formData));
+  const result = fromFormData(Object.fromEntries(formData), ProductSchema);
 
+  // Client side validation
+  if (!result.success)
+    return data(
+      { messages: getErrorMessages(result.error.errors) },
+      { status: 400 },
+    );
+
+  const product = result.data;
   const res = await createNewProduct(product);
 
+  // Server side response
   if (res.data) {
     return data({ messages: res.data }, { status: 400 });
   }
+
   if (res.status === 200) return redirect('/products');
 };
 
 const EditProduct = () => {
-  const {
-    pendingCategories,
-    categoriesError,
-    categoriesData,
-    fetchingCategories,
-  } = fetchCategories();
+  const { categoriesError, categoriesData, fetchingCategories } =
+    fetchCategories();
 
   const [product, setProduct] = useState<Product>({
     name: '',
@@ -40,12 +49,12 @@ const EditProduct = () => {
     price: 0,
     stock: 0,
   });
-  const fetcher = useFetcher();
   const [options, setOptions] = useState(categoriesData);
   const [selectedOption, setSelectedOption] = useState('');
   const [newOption, setNewOption] = useState({ name: '' });
   const [isAddingNew, setIsAddingNew] = useState(false);
 
+  const fetcher = useFetcher();
   const messages = fetcher.data?.messages as ValidationErrors;
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,24 +120,28 @@ const EditProduct = () => {
     setOptions(categoriesData);
   }, [categoriesData]);
 
+  if (categoriesError) throw categoriesError;
+
   return (
-    !fetchingCategories && (
-      <div className='flex h-full items-center justify-center'>
-        <fetcher.Form
-          method='POST'
-          className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
-        >
-          <Input
-            id='name'
-            LabelText='Product name:'
-            onChange={handleInputChange}
-            value={product.name}
-          />
-          {messages?.name && formErrors(messages.name)}
-          <div className='flex flex-col'>
-            <label htmlFor='category' className='text-lg font-medium'>
-              Category:
-            </label>
+    <div className='flex h-full items-center justify-center'>
+      <fetcher.Form
+        method='POST'
+        className='flex w-full max-w-lg flex-col gap-4 rounded-lg border-2 border-zinc-300 p-8 shadow-md'
+      >
+        <Input
+          id='name'
+          LabelText='Product name:'
+          onChange={handleInputChange}
+          value={product.name}
+        />
+        {messages?.name && formErrors(messages.name)}
+        <div className='flex flex-col'>
+          <label htmlFor='category' className='text-lg font-medium'>
+            Category:
+          </label>
+          {fetchingCategories ? (
+            <LoadingSpinner page={false} />
+          ) : (
             <Dropdown
               options={options}
               selectedOption={selectedOption}
@@ -138,41 +151,41 @@ const EditProduct = () => {
               onNewOptionChange={handleNewOptionChange}
               onAddNewOption={handleAddNewOption}
             />
-            {messages?.category && formErrors(messages.category)}
-          </div>
-          <Input
-            id='stock'
-            type='tel'
-            LabelText='Stock:'
-            onChange={handleInputChange}
-            value={product.stock}
-          />
-          {messages?.stock && formErrors(messages.stock)}
-          <Input
-            id='price'
-            LabelText='Price:'
-            onChange={handleInputChange}
-            value={product.price}
-          />
-          {messages?.price && formErrors(messages.price)}
-          <div className='flex gap-6'>
-            <button
-              type='submit'
-              className='flex-1 rounded-lg bg-emerald-300 py-2 font-semibold hover:bg-emerald-200'
-            >
-              Save
-            </button>
+          )}
+          {messages?.category && formErrors(messages.category)}
+        </div>
+        <Input
+          id='stock'
+          type='tel'
+          LabelText='Stock:'
+          onChange={handleInputChange}
+          value={product.stock}
+        />
+        {messages?.stock && formErrors(messages.stock)}
+        <Input
+          id='price'
+          LabelText='Price:'
+          onChange={handleInputChange}
+          value={product.price}
+        />
+        {messages?.price && formErrors(messages.price)}
+        <div className='flex gap-6'>
+          <button
+            type='submit'
+            className='flex-1 rounded-lg bg-emerald-300 py-2 font-semibold hover:bg-emerald-200'
+          >
+            Save
+          </button>
 
-            <Link
-              to={'/products'}
-              className='flex-1 rounded-lg bg-emerald-300 py-2 text-center font-semibold hover:bg-emerald-200'
-            >
-              Cancel
-            </Link>
-          </div>
-        </fetcher.Form>
-      </div>
-    )
+          <Link
+            to={'/products'}
+            className='flex-1 rounded-lg bg-emerald-300 py-2 text-center font-semibold hover:bg-emerald-200'
+          >
+            Cancel
+          </Link>
+        </div>
+      </fetcher.Form>
+    </div>
   );
 };
 
