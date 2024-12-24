@@ -159,7 +159,7 @@ export const getSupplier = async (id) => {
   const query = `
   SELECT
   s.id AS id,
-  s.name AS supplier,
+  s.name AS name,
   s.email AS email,
   s.phone AS phone
   FROM
@@ -182,8 +182,7 @@ export const createNewSupplier = async (supplier) => {
     VALUES ($1, $2, $3);
   `;
 
-  const values = [supplier.supplier, supplier.email, supplier.phone];
-  console.log(values);
+  const values = [supplier.name, supplier.email, supplier.phone];
   await pool.query(query, values);
 };
 
@@ -198,7 +197,7 @@ export const updateSupplier = async (id, supplier) => {
       id = $4;
   `;
 
-  const values = [supplier.supplier, supplier.email, supplier.phone, id];
+  const values = [supplier.name, supplier.email, supplier.phone, id];
 
   return await pool.query(query, values);
 };
